@@ -11,6 +11,8 @@
 - [Citation](#citation)
 
 ## Updates
+- **_News (2022-12-26)_**: Refactoring codes
+- **_News (2022-12-22)_**: Implemented interlace degradation
 - **_News (2022-08-25)_**: Implemented calculator for quantitative score
 - **_News (2022-07-23)_**: Implemented multi-gpus train approach using pytorch distributed data parallel
 - **_News (2022-07-19)_**: Implemented upsampler module at end of Scunet model
@@ -25,12 +27,12 @@
 - SwinIR
 
 ## Features
-- Automated in training super-resolution using PSNR and GAN processes
-- Automated in testing super-resolution models for image and video
+- Training super-resolution using PSNR and GAN approaches
+- Testing super-resolution models for image and video
 
-## Usage
+## SR Trainer Structures
 
-### 1. The tree shows config directories in the repository
+### 1. Configs to manage hyperparameters for train
 ```
 configs/
 ├── models
@@ -49,14 +51,60 @@ configs/
 └── train.yaml
 ```
 
+### 2. Scripts for train and test
+```
+├── archs
+│   ├── BSRGAN
+│   │   ├── README.md
+│   │   └── models.py
+│   ├── EDSR
+│   │   ├── README.md
+│   │   └── models.py
+│   ├── RealESRGAN
+│   │   ├── README.md
+│   │   └── models.py
+│   ├── SCUNet
+│   │   ├── README.md
+│   │   └── models.py
+│   ├── SwinIR
+│   │   └── models.py
+│   ├── Utils
+│   │   ├── __init__.py
+│   │   ├── blocks.py
+│   │   └── utils.py
+│   ├── __init__.py
+├── data
+│   ├── __init__.py
+│   ├── dataset.py
+│   └── degradation.py
+├── learning_rate_scheduler
+│   ├── __init__.py
+├── loss
+│   ├── __init__.py
+│   ├── gan_loss.py
+│   ├── l1_charbonnier_loss.py
+│   └── perceptual_loss.py
+├── metric
+│   └── metrics.py
+├── metricer.py
+├── models.py
+├── optim
+│   ├── __init__.py
+├── tester.py
+├── trainer.py
+└── utils.py
+```
 
-### 2. A user should modify train.yaml or test.yaml in the config directory to Train or Test super-resolution model
+
+## How to use SR Trainer
+
+### 1. Modifying train.yaml in the configs directory with your own hyperparamters to train
 
 #### Train
 
 ```yaml
 ### train.yaml 
-### A user should change model_name and train_type to train with various models
+### A user should change model_name and train_type to train
 
 hydra:
   run:
@@ -73,7 +121,9 @@ defaults:
 
 ### A user should specify train directory in datasets
 dataset:
-  train_dir: datasets_path # /datasets/train
+  train:
+    type: ImagePairDegradationDataset
+    hr_dir: datasets_path
 ```
 
 ```yaml

@@ -1,0 +1,3 @@
+# SCUNet Paper Review
+![](https://heaseochung.github.io/images/SCUNet/SCUNET_ARCH.png)
+최근 몇 년 동안 이미지 노이즈 제거를 해결하기 위해 심층 신경망을 활용하는 사례가 급증했지만 기존 방법은 대부분 AWGN, JPEG 압축 및 카메라 센서 노이즈와 같은 단순한 것은 제거할 수 있었고 실제 이미지에서 생기는 블라인드 노이즈 제거에는 역부족이었다. 본 논문에서는 심층 신경망의 아키택처 설계 및 트레이닝 합성 데이터셋의 관점에서 이러한 문제를 해결하고자 한다. 구체적으로 swin-conv 블록을 통해 residual convolutional layer의 local modeling 과 swin transformer 블록을 통한 non-local modeling 기능을 UNet에 통합하는 아키택처를 사용한다. 그리고 합성 트레이닝 데이터셋은 다양한 종류의 노이즈(가우시안, 포아송, 스페클, JPEG 압축 및 처리된 카메라 센서 노이즈)를 포함하고 크기 조정 시 생기는 노이즈를 포함하는 실용적인 LR 데이터셋을 포함한다. 그리고 다양한 노이즈 기법을 순차적으로 적용하는 것이 아닌 Random 하고 double degradation stategy를 적용한다. [더보기](https://heaseochung.github.io/SCUNet.html)

@@ -1,0 +1,136 @@
+common:
+  iteration: 800001
+  save_img_every: 1000
+  save_model_every: 10000
+  seed: 123
+  use_wandb: false
+  ckpt_dir: "psnr_cpkt"
+  save_img_dir: "images"
+  GAN: false
+
+ddp:
+  distributed: false
+  nodes: 1
+  gpus: 0
+  nr: 0
+  rank: 0
+  world_size: 1
+  dist_url: "tcp://localhost:12355"
+  dist_backend: "nccl"
+
+loss:
+  lists: ["MAE"]
+
+optim:
+  type: "Adam"
+  Adam:
+    lr: !!float 2e-4
+    betas: [0.9, 0.999]
+    weight_decay: 0
+
+scheduler:
+  type: MultiStepLR
+  MultiStepLR:
+    g_milestones: [400000]
+    g_gamma: 0.5
+
+metrics:
+  types: [psnr]
+
+dataset:
+  valid:
+    hr_dir: /dataset/SR/valid/HR
+    lr_dir: /dataset/SR/valid/LR
+    batch_size: 1
+  
+  test:
+    lr_dir: /dataset/SR/test
+    batch_size: 1
+
+  train:
+    type: ImagePairDegradationDataset
+    hr_dir: /dataset/SR/train
+    lr_dir: ""
+    num_workers: 8
+    batch_size: 8
+    patch_size : 128
+    gt_size: 320
+
+    ImagePairDegradationDataset: 
+      sharpen:
+        use: false
+        weight: 1.0
+        radius: 50
+        threshold: 10
+      
+      deg:
+        use: true
+        plus: true
+        processes : [
+          "blur_1",
+          "blur_2",
+          "resize_1",
+          "resize_2",
+          "gaussian_noise_1",
+          "poisson_noise_1",
+          "sparkle_noise_1",
+          "jpeg_noise_1"
+        ]
+        processes_plus : [
+          "blur_1",
+          "resize_1",
+          "gaussian_noise_1",
+          "poisson_noise_1",
+          "sparkle_noise_1",
+          "blur_2",
+          "resize_2",
+          "gaussian_noise_2",
+          "poisson_noise_2",
+          "sparkle_noise_2",
+        ]
+        jpeg_prob: 0.9
+        shuffle_prob: 0.1
+        updown_type: ["up", "down", "keep"]
+        mode_list: ["area", "bilinear", "bicubic"]
+        noise_level1: 2
+        noise_level2: 25
+
+        ### The first degradation process
+        resize_prob: [0.2, 0.7, 0.1] 
+        resize_range: [0.15, 1.5]
+        gaussian_noise_prob: 0.5
+        noise_range: [1, 30]
+        poisson_scale_range: [0.05, 3]
+        gray_noise_prob: 0.4
+        jpeg_range: [30, 95]
+
+        blur_kernel_size: 21
+        kernel_list: ['iso', 'aniso', 'generalized_iso', 'generalized_aniso', 'plateau_iso', 'plateau_aniso']
+        kernel_prob: [0.45, 0.25, 0.12, 0.03, 0.12, 0.03]
+        sinc_prob: 0.1
+        blur_sigma: [0.2, 3]
+        betag_range: [0.5, 4]
+        betap_range: [1, 2]
+
+        ### The second degradation process
+        second_blur_prob: 0.8
+        resize_prob2: [0.3, 0.4, 0.3]  # up, down, keep
+        resize_range2: [0.3, 1.2]
+        gaussian_noise_prob2: 0.5
+        noise_range2: [1, 25]
+        poisson_scale_range2: [0.05, 2.5]
+        gray_noise_prob2: 0.4
+        jpeg_range2: [30, 95]
+
+        blur_kernel_size2: 21
+        kernel_list2: ['iso', 'aniso', 'generalized_iso', 'generalized_aniso', 'plateau_iso', 'plateau_aniso']
+        kernel_prob2: [0.45, 0.25, 0.12, 0.03, 0.12, 0.03]
+        sinc_prob2: 0.1
+        blur_sigma2: [0.2, 1.5]
+        betag_range2: [0.5, 4]
+        betap_range2: [1, 2]
+
+        final_sinc_prob: 0.8
+
+        h_shift_strength: 4
+        v_shift_strength: 3

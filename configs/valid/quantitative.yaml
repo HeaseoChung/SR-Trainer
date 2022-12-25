@@ -1,0 +1,6 @@
+save_path: "quantitative"
+dataset:
+  hr_dir: "/workspace/SuperResolution/example/Ref"
+  lr_dir: "/workspace/SuperResolution/example/Dis"
+
+metrics: [psnr, ssim, lpips, erqa]

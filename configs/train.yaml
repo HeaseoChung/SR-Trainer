@@ -1,0 +1,8 @@
+hydra:
+  run:
+    dir: ./outputs/SCUNET/train/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+defaults:
+  - _self_
+  - train: PSNR
+  - models: SCUNET

@@ -1,0 +1,9 @@
+cff-version: 1.0.0
+message: "If the repository helps your research or work, please consider citing AutomaticSR.<br>
+The following is a BibTeX reference. The BibTeX entry requires the `url` LaTeX package."
+authors:
+- family-names: "Chung"
+  given-names: "Hrsdro"
+title: "AutomaticSR"
+date-released: 2022-07-05
+url: "https://github.com/HeaseoChung/Super-resolution"

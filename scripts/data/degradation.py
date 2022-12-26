@@ -138,14 +138,13 @@ class Degradation:
         )
 
         # Sinc
-        self.pulse_tensor = torch.zeros(
-            21, 21
-        ).float()  # convolving with pulse tensor brings no blurry effect
+        self.final_sinc_prob = cfg.train.dataset.train.ImagePairDegradationDataset.deg.final_sinc_prob
         self.pulse_tensor[10, 10] = 1
+        
 
         # Interlace
-        self.h_shift_strength = train.deg.h_shift_strength
-        self.v_shift_strength = train.deg.v_shift_strength
+        self.h_shift_strength = cfg.train.dataset.train.ImagePairDegradationDataset.deg.h_shift_strength
+        self.v_shift_strength = cfg.train.dataset.train.ImagePairDegradationDataset.deg.v_shift_strength
 
     def data_pipeline(self, hr):
         hr, _ = self.random_crop(hr=hr, lr=None, crop_size=self.gt_size)

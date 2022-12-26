@@ -1,6 +1,6 @@
 common:
   iteration: 800001
-  save_img_every: 1000
+  save_img_every: 10
   save_model_every: 10000
   seed: 123
   use_wandb: false

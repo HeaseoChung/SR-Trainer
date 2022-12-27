@@ -138,13 +138,21 @@ class Degradation:
         )
 
         # Sinc
-        self.final_sinc_prob = cfg.train.dataset.train.ImagePairDegradationDataset.deg.final_sinc_prob
+        self.final_sinc_prob = (
+            cfg.train.dataset.train.ImagePairDegradationDataset.deg.final_sinc_prob
+        )
+        self.pulse_tensor = torch.zeros(
+            21, 21
+        ).float()  # convolving with pulse tensor brings no blurry effect
         self.pulse_tensor[10, 10] = 1
-        
 
         # Interlace
-        self.h_shift_strength = cfg.train.dataset.train.ImagePairDegradationDataset.deg.h_shift_strength
-        self.v_shift_strength = cfg.train.dataset.train.ImagePairDegradationDataset.deg.v_shift_strength
+        self.h_shift_strength = (
+            cfg.train.dataset.train.ImagePairDegradationDataset.deg.h_shift_strength
+        )
+        self.v_shift_strength = (
+            cfg.train.dataset.train.ImagePairDegradationDataset.deg.v_shift_strength
+        )
 
     def data_pipeline(self, hr):
         hr, _ = self.random_crop(hr=hr, lr=None, crop_size=self.gt_size)
@@ -1025,11 +1033,6 @@ class Degradation:
         K = img + self.sharpen_weight * residual
         K = np.clip(K, 0, 1)
         return soft_mask * K + (1 - soft_mask) * img
-        # img = single2uint(img)
-        # kernel_3 = np.array([[0, -0.5, 0], [-0.5, 3, -0.5], [0, -0.5, 0]])
-        # img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel_3)
-        # img = uint2single(img)
-        # return img
 
     def add_JPEG_noise(self, img):
         quality_factor = random.randint(self.jpeg_range[0], self.jpeg_range[1])
@@ -1066,28 +1069,15 @@ class Degradation:
     def add_speckle_noise(self, img):
         noise_level = random.randint(self.noise_level1, self.noise_level2)
         img = np.clip(img, 0.0, 1.0)
-        rnum = random.random()
-        if rnum > 0.6:
-            img += img * np.random.normal(
-                0, noise_level / 255.0, img.shape
-            ).astype(np.float32)
-        elif rnum < 0.4:
-            img += img * np.random.normal(
-                0, noise_level / 255.0, (*img.shape[:2], 1)
-            ).astype(np.float32)
-        else:
-            L = self.noise_level2 / 255.0
-            D = np.diag(np.random.rand(3))
-            U = orth(np.random.rand(3, 3))
-            conv = np.dot(np.dot(np.transpose(U), D), U)
-            img += img * np.random.multivariate_normal(
-                [0, 0, 0], np.abs(L**2 * conv), img.shape[:2]
-            ).astype(np.float32)
-        img = np.clip(img, 0.0, 1.0)
+        row, col, ch = img.shape
+        gauss = np.random.randn(row, col, ch)
+        gauss = gauss.reshape(row, col, ch)
+        noisy = img + img * (gauss / noise_level)
+        img = np.clip(noisy, 0.0, 1.0)
         return img
 
     def add_Poisson_noise(self, img):
-        vals = 10 ** (2 * random.random() + 2.0)  # [2, 4]
+        vals = 10 ** (random.randint(2, 4) * random.random() + 2.0)  # [2, 4]
         if random.random() < 0.5:
             img = np.random.poisson(img * vals).astype(np.float32) / vals
         else:
@@ -1105,7 +1095,9 @@ class Degradation:
         if np.random.uniform() < self.final_sinc_prob:
             kernel_size = random.choice(self.kernel_range)
             omega_c = np.random.uniform(np.pi / 3, np.pi)
-            sinc_kernel = self.circular_lowpass_kernel(omega_c, kernel_size, pad_to=21)
+            sinc_kernel = self.circular_lowpass_kernel(
+                omega_c, kernel_size, pad_to=21
+            )
         else:
             sinc_kernel = self.pulse_tensor
 

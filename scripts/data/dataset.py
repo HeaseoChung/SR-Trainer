@@ -10,13 +10,13 @@ from utils import check_image_file
 
 
 class ImagePairDegradationDataset(Dataset):
-    def __init__(self, cfg):
+    def __init__(self, common, dataset):
 
-        self.data_pipeline = Degradation(cfg)
+        self.data_pipeline = Degradation(common, dataset)
 
         self.hrfiles = [
-            os.path.join(cfg.train.dataset.train.hr_dir, x)
-            for x in os.listdir(cfg.train.dataset.train.hr_dir)
+            os.path.join(dataset.hr_dir, x)
+            for x in os.listdir(dataset.hr_dir)
             if check_image_file(x)
         ]
 
@@ -35,18 +35,18 @@ class ImagePairDegradationDataset(Dataset):
 
 
 class ImagePairDataset(Dataset):
-    def __init__(self, cfg):
-        self.sf = cfg.models.generator.scale
-        self.patch_size = cfg.train.dataset.train.patch_size
+    def __init__(self, common, dataset):
+        self.sf = common.sf
+        self.patch_size = common.patch_size
 
         self.hrfiles = [
-            os.path.join(cfg.train.dataset.train.hr_dir, x)
-            for x in os.listdir(cfg.train.dataset.train.hr_dir)
+            os.path.join(dataset.hr_dir, x)
+            for x in os.listdir(dataset.hr_dir)
             if check_image_file(x)
         ]
         self.lrfiles = [
-            os.path.join(cfg.train.dataset.train.lr_dir, x)
-            for x in os.listdir(cfg.train.dataset.train.lr_dir)
+            os.path.join(dataset.lr_dir, x)
+            for x in os.listdir(dataset.lr_dir)
             if check_image_file(x)
         ]
 

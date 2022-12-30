@@ -1,11 +1,10 @@
-from data.dataset import ImagePairDegradationDataset
+from data.dataset import ImagePairDegradationDataset, ImagePairDataset
 
 
-def define_dataset(cfg):
-    dataset_name = cfg.train.dataset.train.type
+def define_dataset(common, dataset):
+    dataset_name = dataset.type
     print(f"Dataset: {dataset_name} is going to be used")
     if dataset_name == "ImagePairDegradationDataset":
-        return ImagePairDegradationDataset(cfg)
+        return ImagePairDegradationDataset(common, dataset)
     elif dataset_name == "ImagePairDataset":
-        # TODO Add ImagePairDataset()
-        pass
+        return ImagePairDataset(common, dataset)

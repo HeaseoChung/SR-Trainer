@@ -21,40 +21,40 @@ from data.augmentation import (
 
 
 class Degradation:
-    def __init__(self, cfg):
-        self.sf = cfg.models.generator.scale
-        self.patch_size = cfg.train.dataset.train.patch_size
-        self.gt_size = cfg.train.dataset.train.gt_size
+    def __init__(self, common, dataset):
+        self.sf = common.sf
+        self.patch_size = common.patch_size
+        self.gt_size = common.gt_size
         self.shuffle_prob = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.shuffle_prob
+            dataset.ImagePairDegradationDataset.deg.shuffle_prob
         )
         self.num_deg = 7
         self.num_deg_plus = 9
 
         # Sharpen
         self.sharpen = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.sharpen.use
+            dataset.ImagePairDegradationDataset.sharpen.use
         )
         self.sharpen_weight = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.sharpen.weight
+            dataset.ImagePairDegradationDataset.sharpen.weight
         )
         self.sharpen_radius = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.sharpen.radius
+            dataset.ImagePairDegradationDataset.sharpen.radius
         )
         self.sharpen_threshold = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.sharpen.threshold
+            dataset.ImagePairDegradationDataset.sharpen.threshold
         )
 
         """ degradation """
-        self.deg = cfg.train.dataset.train.ImagePairDegradationDataset.deg.use
-        self.plus = cfg.train.dataset.train.ImagePairDegradationDataset.deg.plus
+        self.deg = dataset.ImagePairDegradationDataset.deg.use
+        self.plus = dataset.ImagePairDegradationDataset.deg.plus
         if self.plus:
             self.deg_processes = list(
-                cfg.train.dataset.train.ImagePairDegradationDataset.deg.processes_plus
+                dataset.ImagePairDegradationDataset.deg.processes_plus
             )
         else:
             self.deg_processes = list(
-                cfg.train.dataset.train.ImagePairDegradationDataset.deg.processes
+                dataset.ImagePairDegradationDataset.deg.processes
             )
         self.num_deg = (
             len(self.deg_processes)
@@ -65,86 +65,86 @@ class Degradation:
 
         # Sinc
         self.sinc_prob = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.sinc_prob
+            dataset.ImagePairDegradationDataset.deg.sinc_prob
         )
         self.sinc_prob2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.sinc_prob2
+            dataset.ImagePairDegradationDataset.deg.sinc_prob2
         )
 
         # Blur
         self.kernel_list = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.kernel_list
+            dataset.ImagePairDegradationDataset.deg.kernel_list
         )
         self.kernel_prob = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.kernel_prob
+            dataset.ImagePairDegradationDataset.deg.kernel_prob
         )
         self.blur_sigma = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.blur_sigma
+            dataset.ImagePairDegradationDataset.deg.blur_sigma
         )
         self.betag_range = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.betag_range
+            dataset.ImagePairDegradationDataset.deg.betag_range
         )
         self.betap_range = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.betap_range
+            dataset.ImagePairDegradationDataset.deg.betap_range
         )
         self.kernel_range = [2 * v + 1 for v in range(3, 11)]
 
         self.kernel_list2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.kernel_list2
+            dataset.ImagePairDegradationDataset.deg.kernel_list2
         )
         self.kernel_prob2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.kernel_prob2
+            dataset.ImagePairDegradationDataset.deg.kernel_prob2
         )
         self.blur_sigma2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.blur_sigma2
+            dataset.ImagePairDegradationDataset.deg.blur_sigma2
         )
         self.betag_range2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.betag_range2
+            dataset.ImagePairDegradationDataset.deg.betag_range2
         )
         self.betap_range2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.betap_range2
+            dataset.ImagePairDegradationDataset.deg.betap_range2
         )
 
         # Resize
         self.resize_prob = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.resize_prob
+            dataset.ImagePairDegradationDataset.deg.resize_prob
         )
         self.resize_range = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.resize_range
+            dataset.ImagePairDegradationDataset.deg.resize_range
         )
         self.resize_prob2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.resize_prob2
+            dataset.ImagePairDegradationDataset.deg.resize_prob2
         )
         self.resize_range2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.resize_range2
+            dataset.ImagePairDegradationDataset.deg.resize_range2
         )
 
         self.updown_type = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.updown_type
+            dataset.ImagePairDegradationDataset.deg.updown_type
         )
         self.mode_list = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.mode_list
+            dataset.ImagePairDegradationDataset.deg.mode_list
         )
 
         # Noise
         self.noise_level1 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.noise_level1
+            dataset.ImagePairDegradationDataset.deg.noise_level1
         )  # 2
         self.noise_level2 = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.noise_level2
+            dataset.ImagePairDegradationDataset.deg.noise_level2
         )  # 25
 
         # JPEG
         self.jpeg_prob = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.jpeg_prob
+            dataset.ImagePairDegradationDataset.deg.jpeg_prob
         )
         self.jpeg_range = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.jpeg_range
+            dataset.ImagePairDegradationDataset.deg.jpeg_range
         )
 
         # Sinc
         self.final_sinc_prob = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.final_sinc_prob
+            dataset.ImagePairDegradationDataset.deg.final_sinc_prob
         )
         self.pulse_tensor = torch.zeros(
             21, 21
@@ -153,10 +153,10 @@ class Degradation:
 
         # Interlace
         self.h_shift_strength = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.h_shift_strength
+            dataset.ImagePairDegradationDataset.deg.h_shift_strength
         )
         self.v_shift_strength = (
-            cfg.train.dataset.train.ImagePairDegradationDataset.deg.v_shift_strength
+            dataset.ImagePairDegradationDataset.deg.v_shift_strength
         )
 
     def data_pipeline(self, hr):

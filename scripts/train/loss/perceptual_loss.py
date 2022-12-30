@@ -346,6 +346,7 @@ class PerceptualLoss(nn.Module):
                         * self.layer_weights[k]
                     )
             percep_loss *= self.perceptual_weight
+            percep_loss = 1 - percep_loss
         else:
             percep_loss = None
 

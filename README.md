@@ -1,6 +1,6 @@
 <a href="https://github.com/HeaseoChung/DL-Optimization/tree/master/Python/TensorRT/x86"><img src="https://img.shields.io/badge/-Documentation-brightgreen"/></a>
 
-# AutomaticSR
+# SR Trainer
 - This repository helps to train and test various deep learning based super-resolution models by changing few configurations(.yaml)
 
 ## Contents

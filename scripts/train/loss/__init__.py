@@ -1,7 +1,7 @@
 import torch.nn as nn
-from loss.l1_charbonnier_loss import L1_Charbonnier_loss
-from loss.gan_loss import GANLoss
-from loss.perceptual_loss import PerceptualLoss
+from train.loss.l1_charbonnier_loss import L1_Charbonnier_loss
+from train.loss.gan_loss import GANLoss
+from train.loss.perceptual_loss import PerceptualLoss
 
 
 def define_loss(cfg, gpu):

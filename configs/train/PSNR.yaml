@@ -6,14 +6,11 @@ common:
   use_wandb: false
   ckpt_dir: "psnr_cpkt"
   save_img_dir: "images"
-  GAN: false
+  method: PSNR
 
 ddp:
   distributed: false
   nodes: 1
-  gpus: 0
-  nr: 0
-  rank: 0
   world_size: 1
   dist_url: "tcp://localhost:12355"
   dist_backend: "nccl"
@@ -38,23 +35,24 @@ metrics:
   types: [psnr]
 
 dataset:
-  valid:
+  common:
+    sf: -1
+    gt_size: 320
+    patch_size : 128
+
+  test:
+    type: ImagePairDataset
     hr_dir: /dataset/SR/valid/HR
     lr_dir: /dataset/SR/valid/LR
     batch_size: 1
-  
-  test:
-    lr_dir: /dataset/SR/test
-    batch_size: 1
+    num_workers: 2
 
   train:
     type: ImagePairDegradationDataset
     hr_dir: /dataset/SR/train
     lr_dir: ""
-    num_workers: 8
     batch_size: 8
-    patch_size : 128
-    gt_size: 320
+    num_workers: 8
 
     ImagePairDegradationDataset: 
       sharpen:

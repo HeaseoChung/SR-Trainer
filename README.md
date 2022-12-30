@@ -11,7 +11,8 @@
 - [Citation](#citation)
 
 ## Updates
-- **_News (2022-12-26)_**: Refactoring codes
+- **_News (2022-12-30)_**: Refactoring codes for tester and metricer
+- **_News (2022-12-30)_**: Refactored codes for train
 - **_News (2022-12-22)_**: Implemented interlace degradation
 - **_News (2022-08-25)_**: Implemented calculator for quantitative score
 - **_News (2022-07-23)_**: Implemented multi-gpus train approach using pytorch distributed data parallel

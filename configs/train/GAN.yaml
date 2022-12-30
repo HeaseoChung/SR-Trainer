@@ -1,19 +1,16 @@
 common:
   iteration: 800001
-  save_img_every: 100
+  save_img_every: 1000
   save_model_every: 10000
   seed: 123
   use_wandb: false
   ckpt_dir: "gan_cpkt"
   save_img_dir: "images"
-  GAN: true
+  method: GAN
 
 ddp:
   distributed: false
   nodes: 1
-  gpus: 0
-  nr: 0
-  rank: 0
   world_size: 1
   dist_url: "tcp://localhost:12355"
   dist_backend: "nccl"
@@ -43,29 +40,31 @@ optim:
   Adam:
     lr: !!float 2e-4
     betas: [0.9, 0.999]
-    eps: 1e-08
     weight_decay: 0
-    amsgrad: false
 
 scheduler:
   type: MultiStepLR
-  g_milestones: [400000]
-  d_milestones: [400000]
-  g_gamma: 0.5
-  d_gamma: 0.5
+  MultiStepLR:
+    g_milestones: [400000]
+    g_gamma: 0.5
+    d_milestones: [400000]
+    d_gamma: 0.5
 
 metrics:
   types: [psnr, ssim, lpips]
 
 dataset:
-  valid:
+  common:
+    sf: -1
+    gt_size: 320
+    patch_size : 128
+
+  test:
+    type: ImagePairDataset
     hr_dir: /dataset/SR/valid/HR
     lr_dir: /dataset/SR/valid/LR
     batch_size: 1
-  
-  test:
-    lr_dir: /dataset/SR/test
-    batch_size: 1
+    num_workers: 2
 
   train:
     type: ImagePairDegradationDataset

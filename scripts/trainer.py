@@ -21,7 +21,7 @@ def main(cfg):
         cfg.train.ddp.world_size = gpus * cfg.train.ddp.nodes
 
         trainer = None
-        if cfg.train.common.method == "PSNR":
+        if cfg.train.common.method == "NET":
             trainer = Net
         elif cfg.train.common.method == "GAN":
             trainer = GAN
@@ -34,7 +34,7 @@ def main(cfg):
         dist.destroy_process_group()
     else:
         print("Train with single GPUs")
-        if cfg.train.common.method == "PSNR":
+        if cfg.train.common.method == "NET":
             Net(0, cfg)
         elif cfg.train.common.method == "GAN":
             GAN(0, cfg)

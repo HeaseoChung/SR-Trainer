@@ -28,8 +28,12 @@
 - SwinIR
 
 ## Features
-- Training super-resolution using PSNR and GAN approaches
+- Training super-resolution using NET and GAN approaches
 - Testing super-resolution models for image and video
+
+## Train Approaches
+- NET
+- GAN
 
 ## SR Trainer Structures
 

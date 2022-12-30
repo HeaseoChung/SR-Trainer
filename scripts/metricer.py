@@ -9,9 +9,10 @@ import torch.backends.cudnn as cudnn
 import torchvision.transforms as transforms
 
 from torch.utils.data.dataloader import DataLoader
-from data.dataset import ValidDataset
-from models import define_model
+from data.dataset import ImagePairDataset
+from archs import define_model
 from metric.metrics import *
+
 
 class Metricer:
     def __init__(self, cfg, gpu):
@@ -41,26 +42,24 @@ class Metricer:
                 self.generator.load_state_dict(ckpt["g"])
             else:
                 self.generator.load_state_dict(ckpt)
-    
+
     def _init_metrics(self, metric):
         metrics = []
         for m in metric:
-            if m == 'psnr':
+            if m == "psnr":
                 metrics.append(PSNR())
-            elif m == 'ssim':
+            elif m == "ssim":
                 metrics.append(SSIM())
-            elif m == 'lpips':
+            elif m == "lpips":
                 metrics.append(LPIPS())
-            elif m == 'erqa':
+            elif m == "erqa":
                 metrics.append(ERQA())
         self.metrics = metrics
-    
-    def _init_dataset(self, cfg):
-        num_workers = (
-            8 * torch.cuda.device_count()
-        )
 
-        train_dataset = ValidDataset(cfg)
+    def _init_dataset(self, cfg):
+        num_workers = 8 * torch.cuda.device_count()
+
+        train_dataset = ImagePairDataset(cfg)
 
         self.dataloader = DataLoader(
             dataset=train_dataset,
@@ -88,7 +87,7 @@ class Metricer:
 
                 with torch.no_grad():
                     preds = self.generator(lr)
-                
+
                 for m in self.metrics:
                     scores[m.name].append(m(preds, hr).item())
 
@@ -98,6 +97,7 @@ class Metricer:
         df.index = filenames
         df = df.sort_index()
         df.to_csv("Quantitative_Score.csv")
+
 
 @hydra.main(config_path="../configs", config_name="valid.yaml")
 def main(cfg):

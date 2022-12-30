@@ -1,14 +1,13 @@
 import os
 import cv2
 import hydra
-import logging
 import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
 
 from tqdm import tqdm
 from utils import check_image_file, check_video_file, preprocess, postprocess
-from models import define_model
+from archs import define_model
 
 
 class Tester:
@@ -30,7 +29,7 @@ class Tester:
             raise ValueError("Test type should be image or video")
 
     def _init_model(self, model):
-        self.generator, _ = define_model(model, self.gpu, False)
+        self.generator, _ = define_model(model, self.gpu, "generator")
         self.generator.eval()
 
     def _load_state_dict(self, model):
@@ -39,7 +38,7 @@ class Tester:
                 model.generator.path, map_location=lambda storage, loc: storage
             )
             if len(ckpt) == 3:
-                self.generator.load_state_dict(ckpt["g"])
+                self.generator.load_state_dict(ckpt["model"])
             else:
                 self.generator.load_state_dict(ckpt)
 
@@ -72,12 +71,6 @@ class Tester:
                 os.path.join(self.save_path, path.split("/")[-1]),
                 postprocess(preds),
             )
-
-        ### (train) SCUSR x2 total time to finish : 454.88920283317566
-        ### (train) RealESRGAN x4 total time to finish : 922.6403729915619
-        ### (train) RealESRGAN x2 total time to finish : 361.8168976306915
-        ### (valid) SCUSR x2 total time to finish : 84.97539496421814
-        ### (valid) RealESRGAN x2 total time to finish : 69.5964424610138
 
     def video_test(self):
         import ffmpeg

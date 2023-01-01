@@ -11,14 +11,15 @@
 - [Citation](#citation)
 
 ## Updates
+- **_News (2023-01-01)_**: Implemented Knowledge Distillation
+- **_News (2022-12-30)_**: Refactoring codes for tester and metricer
 - **_News (2022-12-30)_**: Refactoring codes for tester and metricer
 - **_News (2022-12-30)_**: Refactored codes for train
 - **_News (2022-12-22)_**: Implemented interlace degradation
 - **_News (2022-08-25)_**: Implemented calculator for quantitative score
 - **_News (2022-07-23)_**: Implemented multi-gpus train approach using pytorch distributed data parallel
-- **_News (2022-07-19)_**: Implemented upsampler module at end of Scunet model
 - **_News (2022-07-05)_**: Implemented test codes for video and image
-- **_News (2022-07-02)_**: Implemented train codes for super-resolution models such as EDSR, BSRGAN, RealESRGAN, SwinIR and SCUnet
+- **_News (2022-07-02)_**: Implemented train codes for super-resolution models such as EDSR, BSRGAN, RealESRGAN, SwinIR and SCUNet
 
 ## Models
 - BSRGAN

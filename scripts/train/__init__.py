@@ -5,7 +5,6 @@ import torch.distributed as dist
 import torchvision.utils as vutils
 
 from torch import nn
-from torch.nn import functional as F
 from torch.utils.data.dataloader import DataLoader
 from data import define_dataset
 from archs import define_model
@@ -201,14 +200,12 @@ class Trainer:
             average[m.name] = sum(scores[m.name]) / len(scores[m.name])
         return average
 
-    def _visualize(self, hr, lr, preds):
+    def _visualize(self, img1, img2, img3):
         results = torch.cat(
             (
-                hr.detach(),
-                F.interpolate(
-                    lr, scale_factor=self.scale, mode="nearest"
-                ).detach(),
-                preds.detach(),
+                img1.detach(),
+                img2.detach(),
+                img3.detach(),
             ),
             2,
         )

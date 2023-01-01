@@ -26,6 +26,8 @@ class KD(Trainer):
             cfg.models.student.path, self.student, self.s_optim
         )
 
+        self.start_iters = 0
+
         self.t_scheduler = self._init_scheduler(cfg, self.t_optim)
         self.s_scheduler = self._init_scheduler(cfg, self.s_optim)
 
@@ -40,7 +42,7 @@ class KD(Trainer):
 
             if i % self.save_model_every == 0 and self.gpu == 0:
                 average = self._test(self.student)
-                self._save_model("g", i, self.generator, self.g_optim, average)
+                self._save_model("g", i, self.student, self.s_optim, average)
 
     def _train(self, iter):
         def requires_grad(model, flag=True):
@@ -55,19 +57,13 @@ class KD(Trainer):
         self.teacher.train()
         requires_grad(self.teacher, False)
         t_preds = self.teacher(lr)
-        t_loss = 0
-
-        for l in self.loss_lists.keys():
-            t_loss += self.loss_lists[l](t_preds, hr)
-
-        self.teacher.zero_grad()
-        t_loss.backward()
-        self.t_optim.step()
-        self.t_scheduler.step()
+        
+        # t_loss = 0
+        # for l in self.loss_lists.keys():
+        #     t_loss += self.loss_lists[l](t_preds, hr)
 
         """Student"""
         self.student.train()
-        requires_grad(self.teacher, True)
         s_preds = self.student(lr)
         s_loss = 0
 
@@ -76,7 +72,7 @@ class KD(Trainer):
 
         s_loss += F.mse_loss(s_preds, t_preds)
 
-        self.stduent.zero_grad()
+        self.student.zero_grad()
         s_loss.backward()
         self.s_optim.step()
         self.s_scheduler.step()

@@ -1,12 +1,12 @@
 common:
   iteration: 800001
-  save_img_every: 1000
+  save_img_every: 10
   save_model_every: 10000
   seed: 123
   use_wandb: false
-  ckpt_dir: "gan_cpkt"
+  ckpt_dir: "kd_cpkt"
   save_img_dir: "images"
-  method: GAN
+  method: KD
 
 ddp:
   distributed: false
@@ -38,7 +38,7 @@ loss:
 optim:
   type: "Adam"
   Adam:
-    lr: !!float 2e-4
+    lr: !!float 1e-4
     betas: [0.9, 0.999]
     weight_decay: 0
 
@@ -49,7 +49,7 @@ scheduler:
     gamma: 0.5
 
 metrics:
-  types: [psnr, ssim, lpips]
+  types: [psnr, ssim]
 
 dataset:
   common:
@@ -81,7 +81,7 @@ dataset:
         threshold: 10
       
       deg:
-        use: true
+        use: false
         plus: true
         processes : [
           "blur_1",
@@ -149,5 +149,5 @@ dataset:
 
         final_sinc_prob: 0.8
 
-        h_shift_strength: 4
-        v_shift_strength: 3
+        h_shift_strength: 2
+        v_shift_strength: 1

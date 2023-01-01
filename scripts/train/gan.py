@@ -1,4 +1,5 @@
 from train import Trainer
+from torch.nn import functional as F
 
 
 class GAN(Trainer):
@@ -102,4 +103,5 @@ class GAN(Trainer):
         self.d_scheduler.step()
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
+            lr = F.interpolate(lr, scale_factor=self.scale, mode="nearest")
             self._visualize(hr, lr, preds)

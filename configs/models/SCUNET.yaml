@@ -1,6 +1,5 @@
-name: SCUNet
-
 generator:
+  name: SCUNet
   path: ""
   state_dict: ["g", "g_optim", "iteration"]
   scale: 2
@@ -14,8 +13,37 @@ generator:
   upsampler: "nearest+conv"
 
 discriminator:
+  name: UNet_Discriminator
   path: ""
   state_dict: ["d", "d_optim", "iteration"]
   num_in_ch: 3
   num_feat: 64
   skip_connection: true
+
+teacher:
+  name: SCUNet
+  path: ""
+  state_dict: ["g", "g_optim", "iteration"]
+  scale: 2
+  in_nc: 3
+  config: [4, 4, 4, 4, 4, 4, 4]
+  dim: 64
+  head_dim: 32
+  window_size: 8
+  drop_path_rate: 0.0
+  input_resolution: 256
+  upsampler: "nearest+conv"
+
+student:
+  name: SCUNet
+  path: ""
+  state_dict: ["g", "g_optim", "iteration"]
+  scale: 2
+  in_nc: 3
+  config: [1, 1, 1, 1, 1, 1, 1]
+  dim: 64
+  head_dim: 32
+  window_size: 8
+  drop_path_rate: 0.0
+  input_resolution: 256
+  upsampler: "nearest+conv"

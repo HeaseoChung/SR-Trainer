@@ -1,6 +1,5 @@
-name: BSRGAN
-
 generator:
+  name: BSRGAN
   path: ""
   state_dict: ["g", "g_optim", "iteration"]
   scale: 4
@@ -11,6 +10,7 @@ generator:
   num_grow_ch: 32
 
 discriminator:
+  name: PatchGAN_Discriminator
   path: ""
   state_dict: ["d", "d_optim", "iteration"]
   num_in_ch: 3

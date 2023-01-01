@@ -4,5 +4,5 @@ hydra:
 
 defaults:
   - _self_
-  - train: PSNR
+  - train: NET
   - models: SCUNET

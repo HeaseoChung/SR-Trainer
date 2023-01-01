@@ -1,20 +1,19 @@
-import os
-import torch
-import torch.nn as nn
-import torchvision.utils as vutils
-
 from train import Trainer
-from torch.nn import functional as F
 
 
 class GAN(Trainer):
     def __init__(self, gpu, cfg):
         super().__init__(gpu, cfg)
-        self.generator = self._init_model(cfg, "generator")
-        self.discriminator = self._init_model(cfg, "discriminator")
+        self.generator = self._init_model(cfg.models.generator)
+        self.discriminator = self._init_model(cfg.models.discriminator)
 
         if cfg.train.ddp.distributed:
-            self._init_distributed_data_parallel(cfg)
+            self.generator = self._init_distributed_data_parallel(
+                cfg, self.generator
+            )
+            self.discriminator = self._init_distributed_data_parallel(
+                cfg, self.discriminator
+            )
 
         self.g_optim = self._init_optim(cfg, self.generator)
         self.d_optim = self._init_optim(cfg, self.discriminator)
@@ -46,8 +45,7 @@ class GAN(Trainer):
             self.train(i)
 
             if i % self.save_model_every == 0 and self.gpu == 0:
-                average = self._test(i)
-                print(f"average: {average}")
+                average = self._test(self.generator)
                 self._save_model("g", i, self.generator, self.g_optim, average)
                 self._save_model(
                     "d", i, self.discriminator, self.d_optim, average
@@ -105,26 +103,3 @@ class GAN(Trainer):
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
             self._visualize(hr, lr, preds)
-
-    def _test(self, iter):
-        self.generator.eval()
-        scores = {}
-        average = {}
-
-        for m in self.metrics:
-            scores[m.name] = []
-
-        for lr, hr in self.test_dataloader:
-            lr = lr.to(self.gpu)
-            hr = hr.to(self.gpu)
-
-            with torch.no_grad():
-                preds = self.generator(lr)
-
-            for m in self.metrics:
-                scores[m.name].append(m(preds, hr).item())
-
-        for m in self.metrics:
-            average[m.name] = sum(scores[m.name]) / len(scores[m.name])
-
-        return average

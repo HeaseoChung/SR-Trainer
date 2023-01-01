@@ -4,9 +4,9 @@ common:
   save_model_every: 10000
   seed: 123
   use_wandb: false
-  ckpt_dir: "psnr_cpkt"
+  ckpt_dir: "gan_cpkt"
   save_img_dir: "images"
-  method: PSNR
+  method: GAN
 
 ddp:
   distributed: false
@@ -16,7 +16,24 @@ ddp:
   dist_backend: "nccl"
 
 loss:
-  lists: ["MAE"]
+  lists: ["MAE", "PerceptualLoss"] #MAE
+  GANLoss:
+    real_label_val: 1.0
+    fake_label_val: 0.0
+    loss_weight: !!float 1e-1
+  PerceptualLoss:
+    vgg_path: /workspace/SuperResolution/model_zoo/VGG/vgg19-dcbb9e9d.pth # https://pytorch.org/vision/0.8/_modules/torchvision/models/vgg.html
+    layer_weights:
+      'conv1_2': 0.1
+      'conv2_2': 0.1
+      'conv3_4': 1
+      'conv4_4': 1
+      'conv5_4': 1
+    vgg_type: vgg19
+    use_input_norm: true,
+    range_norm: false,
+    perceptual_weight: !!float 1.0
+    criterion: l1
 
 optim:
   type: "Adam"
@@ -28,11 +45,11 @@ optim:
 scheduler:
   type: MultiStepLR
   MultiStepLR:
-    g_milestones: [400000]
-    g_gamma: 0.5
+    milestones: [400000]
+    gamma: 0.5
 
 metrics:
-  types: [psnr]
+  types: [psnr, ssim, lpips]
 
 dataset:
   common:
@@ -51,8 +68,10 @@ dataset:
     type: ImagePairDegradationDataset
     hr_dir: /dataset/SR/train
     lr_dir: ""
-    batch_size: 8
     num_workers: 8
+    batch_size: 8
+    patch_size : 128
+    gt_size: 320
 
     ImagePairDegradationDataset: 
       sharpen:

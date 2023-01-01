@@ -67,8 +67,8 @@ class Trainer:
         self.metrics = None
         self.avgerage = {}
 
-    def _init_model(self, cfg, model_type):
-        return define_model(cfg.models, self.gpu, model_type)
+    def _init_model(self, cfg):
+        return define_model(cfg, self.gpu)
 
     def _load_state_dict(self, path, model, optim):
         if path:
@@ -179,8 +179,8 @@ class Trainer:
     def _init_metrics(self, cfg):
         self.metrics = define_metrics(cfg)
 
-    def _test(self, iter):
-        self.generator.eval()
+    def _test(self, model):
+        model.eval()
         scores = {}
         average = {}
 
@@ -192,7 +192,7 @@ class Trainer:
             hr = hr.to(self.gpu)
 
             with torch.no_grad():
-                preds = self.generator(lr)
+                preds = model(lr)
 
             for m in self.metrics:
                 scores[m.name].append(m(preds, hr).item())

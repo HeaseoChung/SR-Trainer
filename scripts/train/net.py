@@ -1,17 +1,13 @@
-import os
-import torch
-import torch.nn as nn
-
 from train import Trainer
-from metric.metrics import *
-
 
 class Net(Trainer):
     def __init__(self, gpu, cfg):
         super().__init__(gpu, cfg)
-        self.generator = self._init_model(cfg, "generator")
+        self.generator = self._init_model(cfg.models.generator)
         if cfg.train.ddp.distributed:
-            self._init_distributed_data_parallel(cfg)
+            self.generator = self._init_distributed_data_parallel(
+                cfg, self.generator
+            )
         self.g_optim = self._init_optim(cfg, self.generator)
         self.generator, self.g_optim = self._load_state_dict(
             cfg.models.generator.path, self.generator, self.g_optim
@@ -28,7 +24,8 @@ class Net(Trainer):
             self._train(i)
 
             if i % self.save_model_every == 0 and self.gpu == 0:
-                average = self._test(i)
+                average = self._test(self.generator)
+                print(average)
                 self._save_model("g", i, self.generator, self.g_optim, average)
 
     def _train(self, iter):

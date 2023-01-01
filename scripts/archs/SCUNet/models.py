@@ -7,7 +7,7 @@ year={2022}
 }
 This models.py From: https://github.com/cszn/scunet
 """
-
+import hydra
 import torch
 import torch.nn as nn
 
@@ -478,11 +478,37 @@ class Generator(nn.Module):
             nn.init.constant_(m.weight, 1.0)
 
 
+@hydra.main(config_path="../../../configs/", config_name="train.yaml")
+def main(cfg):
+    import os
+    from torch.profiler import profile, record_function, ProfilerActivity
+
+    model = Generator(cfg=cfg.models.generator).cuda()
+
+    ckpt = torch.load(
+        cfg.models.generator.path,
+        map_location=lambda storage, loc: storage,
+    )
+    model.load_state_dict(ckpt["g"])
+
+    torch.save(model.state_dict(), f"SCUNET_TEACHER.pth")
+
+    # model.eval()
+
+    # inputs = torch.randn((1, 3, 1080, 1920)).cuda()
+    # with profile(
+    #     activities=[ProfilerActivity.CUDA], record_shapes=True
+    # ) as prof:
+    #     with record_function("model_inference"):
+    #         with torch.no_grad():
+    #             model(inputs)
+
+    # print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
+
+    # model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    # params = sum([np.prod(p.size()) for p in model_parameters])
+    # print(f"model params: {params}")
+
+
 if __name__ == "__main__":
-
-    # torch.cuda.empty_cache()
-    net = Generator(cfg=0)
-
-    x = torch.randn((2, 3, 64, 128))
-    x = net(x)
-    print(x.shape)
+    main()

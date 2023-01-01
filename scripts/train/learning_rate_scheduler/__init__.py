@@ -8,8 +8,8 @@ def define_LR_scheduler(cfg, optimizer, start_iter):
     if lr_scheduler_type == "MultiStepLR":
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer,
-            cfg.train.scheduler.MultiStepLR.g_milestones,
-            cfg.train.scheduler.MultiStepLR.g_gamma,
+            cfg.train.scheduler.MultiStepLR.milestones,
+            cfg.train.scheduler.MultiStepLR.gamma,
             last_epoch=start_iter if start_iter > 0 else -1,
         )
     elif lr_scheduler_type == "CosineAnnealingWarmRestarts":

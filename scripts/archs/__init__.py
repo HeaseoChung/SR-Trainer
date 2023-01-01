@@ -1,53 +1,41 @@
-def define_model(configs, gpu, model_type):
+def define_model(configs, gpu):
     model = None
     model_name = configs.name.lower()
 
     if model_name == "scunet":
-        if model_type == "generator":
-            from archs.SCUNet.models import Generator
+        from archs.SCUNet.models import Generator
 
-            model = Generator(configs.generator).to(gpu)
-
-        elif model_type == "discriminator":
-            from archs.Discriminators.unet_discriminator import Discriminator
-
-            model = Discriminator(configs.discriminator).to(gpu)
+        model = Generator(configs).to(gpu)
 
     elif model_name == "realesrgan":
-        if model_type == "generator":
-            from archs.RealESRGAN.models import Generator
+        from archs.RealESRGAN.models import Generator
 
-            model = Generator(configs.generator).to(gpu)
-
-        elif model_type == "discriminator":
-            from archs.Discriminators.unet_discriminator import Discriminator
-
-            model = Discriminator(configs.discriminator).to(gpu)
+        model = Generator(configs).to(gpu)
 
     elif model_name == "bsrgan":
-        if model_type == "generator":
-            from archs.BSRGAN.models import Generator
+        from archs.BSRGAN.models import Generator
 
-            model = Generator(configs.generator).to(gpu)
-
-        elif model_type == "discriminator":
-            from archs.Discriminators.patchgan_discriminator import (
-                Discriminator,
-            )
-
-            model = Discriminator(configs.discriminator).to(gpu)
+        model = Generator(configs).to(gpu)
 
     elif model_name == "edsr":
-        if model_type == "generator":
-            from archs.EDSR.models import Generator
+        from archs.EDSR.models import Generator
 
-            model = Generator(configs.generator).to(gpu)
+        model = Generator(configs).to(gpu)
 
     elif model_name == "swinir":
-        if model_type == "generator":
-            from archs.SwinIR.models import Generator
+        from archs.SwinIR.models import Generator
 
-            model = Generator(configs.generator).to(gpu)
+        model = Generator(configs).to(gpu)
+
+    elif model_name == "unet_discriminator":
+        from archs.Discriminators.unet_discriminator import Discriminator
+
+        model = Discriminator(configs).to(gpu)
+
+    elif model_name == "patchgan_discriminator":
+        from archs.Discriminators.patchgan_discriminator import Discriminator
+
+        model = Discriminator(configs).to(gpu)
 
     assert model != None, "Model is None"
 

@@ -25,22 +25,14 @@ class Degradation:
         self.sf = common.sf
         self.patch_size = common.patch_size
         self.gt_size = common.gt_size
-        self.shuffle_prob = (
-            dataset.ImagePairDegradationDataset.deg.shuffle_prob
-        )
+        self.shuffle_prob = dataset.ImagePairDegradationDataset.deg.shuffle_prob
         self.num_deg = 7
         self.num_deg_plus = 9
 
         # Sharpen
-        self.sharpen = (
-            dataset.ImagePairDegradationDataset.sharpen.use
-        )
-        self.sharpen_weight = (
-            dataset.ImagePairDegradationDataset.sharpen.weight
-        )
-        self.sharpen_radius = (
-            dataset.ImagePairDegradationDataset.sharpen.radius
-        )
+        self.sharpen = dataset.ImagePairDegradationDataset.sharpen.use
+        self.sharpen_weight = dataset.ImagePairDegradationDataset.sharpen.weight
+        self.sharpen_radius = dataset.ImagePairDegradationDataset.sharpen.radius
         self.sharpen_threshold = (
             dataset.ImagePairDegradationDataset.sharpen.threshold
         )
@@ -64,67 +56,33 @@ class Degradation:
         self.num_half_deg = self.num_deg // 2
 
         # Sinc
-        self.sinc_prob = (
-            dataset.ImagePairDegradationDataset.deg.sinc_prob
-        )
-        self.sinc_prob2 = (
-            dataset.ImagePairDegradationDataset.deg.sinc_prob2
-        )
+        self.sinc_prob = dataset.ImagePairDegradationDataset.deg.sinc_prob
+        self.sinc_prob2 = dataset.ImagePairDegradationDataset.deg.sinc_prob2
 
         # Blur
-        self.kernel_list = (
-            dataset.ImagePairDegradationDataset.deg.kernel_list
-        )
-        self.kernel_prob = (
-            dataset.ImagePairDegradationDataset.deg.kernel_prob
-        )
-        self.blur_sigma = (
-            dataset.ImagePairDegradationDataset.deg.blur_sigma
-        )
-        self.betag_range = (
-            dataset.ImagePairDegradationDataset.deg.betag_range
-        )
-        self.betap_range = (
-            dataset.ImagePairDegradationDataset.deg.betap_range
-        )
+        self.kernel_list = dataset.ImagePairDegradationDataset.deg.kernel_list
+        self.kernel_prob = dataset.ImagePairDegradationDataset.deg.kernel_prob
+        self.blur_sigma = dataset.ImagePairDegradationDataset.deg.blur_sigma
+        self.betag_range = dataset.ImagePairDegradationDataset.deg.betag_range
+        self.betap_range = dataset.ImagePairDegradationDataset.deg.betap_range
         self.kernel_range = [2 * v + 1 for v in range(3, 11)]
 
-        self.kernel_list2 = (
-            dataset.ImagePairDegradationDataset.deg.kernel_list2
-        )
-        self.kernel_prob2 = (
-            dataset.ImagePairDegradationDataset.deg.kernel_prob2
-        )
-        self.blur_sigma2 = (
-            dataset.ImagePairDegradationDataset.deg.blur_sigma2
-        )
-        self.betag_range2 = (
-            dataset.ImagePairDegradationDataset.deg.betag_range2
-        )
-        self.betap_range2 = (
-            dataset.ImagePairDegradationDataset.deg.betap_range2
-        )
+        self.kernel_list2 = dataset.ImagePairDegradationDataset.deg.kernel_list2
+        self.kernel_prob2 = dataset.ImagePairDegradationDataset.deg.kernel_prob2
+        self.blur_sigma2 = dataset.ImagePairDegradationDataset.deg.blur_sigma2
+        self.betag_range2 = dataset.ImagePairDegradationDataset.deg.betag_range2
+        self.betap_range2 = dataset.ImagePairDegradationDataset.deg.betap_range2
 
         # Resize
-        self.resize_prob = (
-            dataset.ImagePairDegradationDataset.deg.resize_prob
-        )
-        self.resize_range = (
-            dataset.ImagePairDegradationDataset.deg.resize_range
-        )
-        self.resize_prob2 = (
-            dataset.ImagePairDegradationDataset.deg.resize_prob2
-        )
+        self.resize_prob = dataset.ImagePairDegradationDataset.deg.resize_prob
+        self.resize_range = dataset.ImagePairDegradationDataset.deg.resize_range
+        self.resize_prob2 = dataset.ImagePairDegradationDataset.deg.resize_prob2
         self.resize_range2 = (
             dataset.ImagePairDegradationDataset.deg.resize_range2
         )
 
-        self.updown_type = (
-            dataset.ImagePairDegradationDataset.deg.updown_type
-        )
-        self.mode_list = (
-            dataset.ImagePairDegradationDataset.deg.mode_list
-        )
+        self.updown_type = dataset.ImagePairDegradationDataset.deg.updown_type
+        self.mode_list = dataset.ImagePairDegradationDataset.deg.mode_list
 
         # Noise
         self.noise_level1 = (
@@ -135,12 +93,8 @@ class Degradation:
         )  # 25
 
         # JPEG
-        self.jpeg_prob = (
-            dataset.ImagePairDegradationDataset.deg.jpeg_prob
-        )
-        self.jpeg_range = (
-            dataset.ImagePairDegradationDataset.deg.jpeg_range
-        )
+        self.jpeg_prob = dataset.ImagePairDegradationDataset.deg.jpeg_prob
+        self.jpeg_range = dataset.ImagePairDegradationDataset.deg.jpeg_range
 
         # Sinc
         self.final_sinc_prob = (
@@ -273,6 +227,7 @@ class Degradation:
                             lr = lr[0 :: self.sf, 0 :: self.sf, ...]
                         lr = np.clip(lr, 0.0, 1.0)
                     elif deg == "resize_2":
+                        a, b = lr.shape[1], lr.shape[0]
                         lr = cv2.resize(
                             lr,
                             (int(1 / self.sf * a), int(1 / self.sf * b)),

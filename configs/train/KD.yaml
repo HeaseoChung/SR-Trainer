@@ -1,6 +1,6 @@
 common:
   iteration: 800001
-  save_img_every: 10
+  save_img_every: 1000
   save_model_every: 10000
   seed: 123
   use_wandb: false
@@ -16,7 +16,7 @@ ddp:
   dist_backend: "nccl"
 
 loss:
-  lists: ["MAE", "PerceptualLoss"] #MAE
+  lists: ["MAE"] #MAE, "PerceptualLoss"
   GANLoss:
     real_label_val: 1.0
     fake_label_val: 0.0
@@ -81,8 +81,8 @@ dataset:
         threshold: 10
       
       deg:
-        use: false
-        plus: true
+        use: true
+        plus: false
         processes : [
           "blur_1",
           "blur_2",

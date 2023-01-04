@@ -1,6 +1,5 @@
-name: EDSR
-
 generator:
+  name: EDSR
   path: ""
   state_dict: ["g", "g_optim", "iteration"]
   scale: 2

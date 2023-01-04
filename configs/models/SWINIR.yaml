@@ -1,6 +1,5 @@
-name: SwinIR
-
 generator:
+  name: SwinIR
   path: ""
   state_dict: ["g", "g_optim", "iteration"]
   img_size: 64
@@ -25,6 +24,7 @@ generator:
   resi_connection: "1conv"
 
 discriminator:
+  name: UNet_Discriminator
   path: ""
   state_dict: ["d", "d_optim", "iteration"]
   num_in_ch: 3

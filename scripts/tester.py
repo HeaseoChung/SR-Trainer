@@ -6,7 +6,12 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 
 from tqdm import tqdm
-from utils import check_image_file, check_video_file, preprocess, postprocess
+from data.utils import (
+    check_image_file,
+    check_video_file,
+    preprocess,
+    postprocess,
+)
 from archs import define_model
 
 

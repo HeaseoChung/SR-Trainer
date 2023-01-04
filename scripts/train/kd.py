@@ -57,7 +57,7 @@ class KD(Trainer):
         self.teacher.train()
         requires_grad(self.teacher, False)
         t_preds = self.teacher(lr)
-        
+
         # t_loss = 0
         # for l in self.loss_lists.keys():
         #     t_loss += self.loss_lists[l](t_preds, hr)

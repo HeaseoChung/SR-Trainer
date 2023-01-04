@@ -27,19 +27,15 @@ def random_crop(hr, lr=None, crop_size=320, sf=2):
 
     x = np.random.randint(0, max_x)
     y = np.random.randint(0, max_y)
-
+    
     hr = hr[y : y + crop_size, x : x + crop_size]
 
     if lr is not None:
+        x = x // sf
+        y = y // sf
+        crop_size = crop_size // sf
+
         lr = lr[y : y + crop_size, x : x + crop_size]
-        lr = cv2.resize(
-            lr,
-            (
-                crop_size // sf,
-                crop_size // sf,
-            ),
-            interpolation=random.choice([1, 2, 3]),
-        )
 
     return hr, lr
     

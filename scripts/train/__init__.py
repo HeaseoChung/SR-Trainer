@@ -88,6 +88,7 @@ class Trainer:
             else:
                 model.load_state_dict(ckpt)
         else:
+            self.start_iters = 0
             print("State dictionary: Checkpoint is not going to be used")
 
         return model, optim
@@ -176,7 +177,7 @@ class Trainer:
         return model
 
     def _init_metrics(self, cfg):
-        self.metrics = define_metrics(cfg)
+        self.metrics = define_metrics(cfg.train)
 
     def _test(self, model):
         model.eval()

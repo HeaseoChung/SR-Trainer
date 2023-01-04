@@ -27,12 +27,6 @@ class GAN(Trainer):
             cfg.models.discriminator.path, self.discriminator, self.d_optim
         )
 
-        if (
-            cfg.models.generator.path == ""
-            or cfg.models.discriminator.path == ""
-        ):
-            self.start_iters = 0
-
         self.g_scheduler = self._init_scheduler(cfg, self.g_optim)
         self.d_scheduler = self._init_scheduler(cfg, self.d_optim)
 

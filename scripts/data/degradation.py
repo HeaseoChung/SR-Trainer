@@ -11,7 +11,7 @@ from scipy import special
 from scipy import ndimage
 from scipy.linalg import orth
 
-from utils import uint2single, single2uint
+from data.utils import uint2single, single2uint
 from data.augmentation import (
     random_crop,
     random_roate,
@@ -249,11 +249,12 @@ class Degradation:
         lr = cv2.resize(
             lr,
             (
-                self.gt_size,
-                self.gt_size,
+                self.gt_size//2,
+                self.gt_size//2,
             ),
             interpolation=random.choice([1, 2, 3]),
         )
+
         hr, lr = random_crop(
             hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
         )

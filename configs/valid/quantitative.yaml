@@ -1,6 +1,18 @@
-save_path: "quantitative"
+common:
+  ckpt_dir: "quantitative"
+  seed: 123
+  
 dataset:
-  hr_dir: "/workspace/SuperResolution/example/Ref"
-  lr_dir: "/workspace/SuperResolution/example/Dis"
+  common:
+    sf: 2
+    patch_size : -1
 
-metrics: [psnr, ssim, lpips, erqa]
+  valid:
+    type: ImagePairDataset
+    hr_dir: /dataset/SR/deg/HR
+    lr_dir: /dataset/SR/deg/LR
+    batch_size: 1
+    num_workers: 4
+
+metrics: 
+  types: [psnr, ssim, lpips]

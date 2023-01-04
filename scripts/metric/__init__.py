@@ -3,7 +3,7 @@ from metric.metrics import *
 
 def define_metrics(cfg):
     metrics = []
-    for m in cfg.train.metrics.types:
+    for m in cfg.metrics.types:
         if m == "psnr":
             metrics.append(PSNR())
         elif m == "ssim":
@@ -13,5 +13,5 @@ def define_metrics(cfg):
         elif m == "erqa":
             metrics.append(ERQA())
 
-    print(f"Metrics: {cfg.train.metrics.types} is going to be used")
+    print(f"Metrics: {cfg.metrics.types} is going to be used")
     return metrics

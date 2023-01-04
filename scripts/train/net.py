@@ -27,8 +27,7 @@ class Net(Trainer):
 
             if i % self.save_model_every == 0 and self.gpu == 0:
                 average = self._test(self.generator)
-                print(average)
-                self._save_model("s", i, self.generator, self.g_optim, average)
+                self._save_model("g", i, self.generator, self.g_optim, average)
 
     def _train(self, iter):
         self.generator.train()

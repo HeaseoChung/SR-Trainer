@@ -65,7 +65,7 @@ class ImagePairDataset(Dataset):
         hr = cv2.cvtColor(hr, cv2.COLOR_BGR2RGB)
 
         lr = cv2.imread(self.lrfiles[index])
-        lr = cv2.cvtColor(hr, cv2.COLOR_BGR2RGB)
+        lr = cv2.cvtColor(lr, cv2.COLOR_BGR2RGB)
 
         if self.rand_crop:
             hr, lr = random_crop(hr, lr, self.patch_size, self.sf)

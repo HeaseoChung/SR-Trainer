@@ -3,6 +3,7 @@ import torch
 import torch.backends.cudnn as cudnn
 import torch.multiprocessing as mp
 import torch.distributed as dist
+import numpy as np
 
 from train.net import Net
 from train.gan import GAN
@@ -14,6 +15,7 @@ def main(cfg):
     cudnn.benchmark = True
     cudnn.deterministic = True
     torch.manual_seed(cfg.train.common.seed)
+    np.random.seed(cfg.train.common.seed)
 
     trainer = None
     if cfg.train.common.method == "NET":
@@ -45,8 +47,7 @@ def main(cfg):
             trainer(0, cfg)
 
 
-# GPU4 956956 block 1
-# GPU5 939975 block 2
-# GPU6 dim head
+# GPU5 1595566 NET Block4 deg true
+# GPU6 1609991 KD (Block4 - Block1) deg true
 if __name__ == "__main__":
     main()

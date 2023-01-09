@@ -1,9 +1,10 @@
 common:
   iteration: 800001
+  save_log_every: 100
   save_img_every: 1000
   save_model_every: 10000
   seed: 123
-  use_wandb: false
+  use_wandb: true
   ckpt_dir: "psnr_cpkt"
   save_img_dir: "images"
   method: NET
@@ -21,14 +22,14 @@ loss:
 optim:
   type: "Adam"
   Adam:
-    lr: !!float 2e-4
+    lr: !!float 1e-4
     betas: [0.9, 0.999]
     weight_decay: 0
 
 scheduler:
   type: MultiStepLR
   MultiStepLR:
-    milestones: [400000]
+    milestones: [400000, 800000, 1000000]
     gamma: 0.5
 
 metrics:
@@ -37,13 +38,11 @@ metrics:
 dataset:
   common:
     sf: -1
-    gt_size: 320
-    patch_size : 128
-
   test:
     type: ImagePairDataset
-    hr_dir: /dataset/SR/valid/HR
-    lr_dir: /dataset/SR/valid/LR
+    hr_dir: /dataset/SR/DIV2KRK/gt
+    lr_dir: /dataset/SR/DIV2KRK/lr_x2
+    patch_size : -1
     batch_size: 1
     num_workers: 2
 
@@ -51,6 +50,8 @@ dataset:
     type: ImagePairDegradationDataset
     hr_dir: /dataset/SR/train
     lr_dir: ""
+    gt_size: 320
+    patch_size : 256
     batch_size: 16
     num_workers: 8
 
@@ -62,11 +63,11 @@ dataset:
         threshold: 10
       
       deg:
-        use: false
-        plus: true
+        use: true
+        plus: false
         processes : [
-          "blur_1",
-          "blur_2",
+          # "blur_1",
+          # "blur_2",
           "resize_1",
           "resize_2",
           "gaussian_noise_1",
@@ -130,5 +131,5 @@ dataset:
 
         final_sinc_prob: 0.8
 
-        h_shift_strength: 4
-        v_shift_strength: 3
+        h_shift_strength: 2
+        v_shift_strength: 1

@@ -27,6 +27,7 @@ class Net(Trainer):
 
             if i % self.save_model_every == 0 and self.gpu == 0:
                 average = self._test(self.generator)
+                self._print(average)
                 self._save_model("g", i, self.generator, self.g_optim, average)
 
     def _train(self, iter):
@@ -38,14 +39,20 @@ class Net(Trainer):
 
         preds = self.generator(lr)
 
-        loss = 0
-        for t_loss in self.loss_lists.keys():
-            loss += self.loss_lists[t_loss](preds, hr)
+        losses = {}
+        for l in self.loss_lists.keys():
+            losses[l] = self.loss_lists[l](preds, hr)
+
+        total_loss = sum(losses.values())
+        losses["total_loss"] = total_loss
 
         self.generator.zero_grad()
-        loss.backward()
+        total_loss.backward()
         self.g_optim.step()
         self.g_scheduler.step()
+
+        if iter % self.save_log_every == 0 and self.gpu == 0:
+            self._print(losses)
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
             lr = F.interpolate(lr, scale_factor=self.scale, mode="nearest")

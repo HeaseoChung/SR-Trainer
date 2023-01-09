@@ -42,6 +42,7 @@ class KD(Trainer):
 
             if i % self.save_model_every == 0 and self.gpu == 0:
                 average = self._test(self.student)
+                self._print(average)
                 self._save_model("g", i, self.student, self.s_optim, average)
 
     def _train(self, iter):
@@ -58,24 +59,26 @@ class KD(Trainer):
         requires_grad(self.teacher, False)
         t_preds = self.teacher(lr)
 
-        # t_loss = 0
-        # for l in self.loss_lists.keys():
-        #     t_loss += self.loss_lists[l](t_preds, hr)
-
         """Student"""
         self.student.train()
         s_preds = self.student(lr)
-        s_loss = 0
 
+        losses = {}
         for l in self.loss_lists.keys():
-            s_loss += self.loss_lists[l](s_preds, hr)
+            if l == "Wavelet":
+                losses[l] = self.loss_lists[l](s_preds, t_preds)
+            else:
+                losses[l] = self.loss_lists[l](s_preds, hr)
 
-        s_loss += F.mse_loss(s_preds, t_preds)
-
+        total_loss = sum(losses.values())
+        losses["total_loss"] = total_loss
         self.student.zero_grad()
-        s_loss.backward()
+        total_loss.backward()
         self.s_optim.step()
         self.s_scheduler.step()
+
+        if iter % self.save_log_every == 0 and self.gpu == 0:
+            self._print(losses)
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
             self._visualize(hr, t_preds, s_preds)

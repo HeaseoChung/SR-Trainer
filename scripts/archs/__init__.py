@@ -1,4 +1,5 @@
 def define_model(configs, gpu):
+    print(configs)
     model = None
     model_name = configs.name.lower()
 

@@ -24,7 +24,9 @@ class Tester:
         self.save_path = cfg.test.common.save_path
         os.makedirs(self.save_path, exist_ok=True)
 
-        self._init_model(cfg.models)
+        self._init_model(
+            cfg.models.generator,
+        )
         self._load_state_dict(cfg.models)
         if cfg.test.common.type == "image":
             self.img_test()
@@ -34,7 +36,7 @@ class Tester:
             raise ValueError("Test type should be image or video")
 
     def _init_model(self, model):
-        self.generator, _ = define_model(model, self.gpu, "generator")
+        self.generator = define_model(model, self.gpu)
         self.generator.eval()
 
     def _load_state_dict(self, model):
@@ -62,11 +64,11 @@ class Tester:
         for path in tqdm(images):
             img = cv2.imread(path)
             h, w = img.shape[:2]
-            img = cv2.resize(
-                img,
-                (w // self.scale, h // self.scale),
-                interpolation=cv2.INTER_CUBIC,
-            )
+            # img = cv2.resize(
+            #     img,
+            #     (w // self.scale, h // self.scale),
+            #     interpolation=cv2.INTER_CUBIC,
+            # )
             lr = preprocess(img).to(self.gpu)
 
             with torch.no_grad():

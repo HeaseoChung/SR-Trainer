@@ -1,5 +1,6 @@
 common:
   iteration: 800001
+  save_log_every: 100
   save_img_every: 1000
   save_model_every: 10000
   seed: 123
@@ -54,13 +55,11 @@ metrics:
 dataset:
   common:
     sf: -1
-    gt_size: 320
-    patch_size : 128
-
   test:
     type: ImagePairDataset
-    hr_dir: /dataset/SR/valid/HR
-    lr_dir: /dataset/SR/valid/LR
+    hr_dir: /dataset/SR/DIV2KRK/gt
+    lr_dir: /dataset/SR/DIV2KRK/lr_x2
+    patch_size : -1
     batch_size: 1
     num_workers: 2
 
@@ -68,10 +67,10 @@ dataset:
     type: ImagePairDegradationDataset
     hr_dir: /dataset/SR/train
     lr_dir: ""
-    num_workers: 8
-    batch_size: 8
-    patch_size : 128
     gt_size: 320
+    patch_size : 256
+    batch_size: 16
+    num_workers: 8
 
     ImagePairDegradationDataset: 
       sharpen:
@@ -82,10 +81,10 @@ dataset:
       
       deg:
         use: true
-        plus: true
+        plus: false
         processes : [
-          "blur_1",
-          "blur_2",
+          # "blur_1",
+          # "blur_2",
           "resize_1",
           "resize_2",
           "gaussian_noise_1",
@@ -149,5 +148,5 @@ dataset:
 
         final_sinc_prob: 0.8
 
-        h_shift_strength: 4
-        v_shift_strength: 3
+        h_shift_strength: 2
+        v_shift_strength: 1

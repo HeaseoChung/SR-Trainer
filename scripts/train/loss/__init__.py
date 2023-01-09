@@ -2,7 +2,7 @@ import torch.nn as nn
 from train.loss.l1_charbonnier_loss import L1_Charbonnier_loss
 from train.loss.gan_loss import GANLoss
 from train.loss.perceptual_loss import PerceptualLoss
-
+from train.loss.pytorch_wavelets import DWTForward
 
 def define_loss(cfg, gpu):
     loss_lists = {}
@@ -18,5 +18,11 @@ def define_loss(cfg, gpu):
             )
         elif loss == "GANLoss":
             loss_lists[loss] = GANLoss(cfg.train.loss.GANLoss).to(gpu)
+        elif loss == "Wavelet":
+            loss_lists[loss] = DWTForward(
+                wave=cfg.train.loss.WaveletLoss.type,
+                J=cfg.train.loss.WaveletLoss.level, 
+                mode=cfg.train.loss.WaveletLoss.pad).to(gpu)
+
     print(f"Loss function: {loss_lists.keys()} is going to be used")
     return loss_lists

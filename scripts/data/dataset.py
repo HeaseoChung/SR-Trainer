@@ -40,7 +40,7 @@ class ImagePairDegradationDataset(Dataset):
 class ImagePairDataset(Dataset):
     def __init__(self, common, dataset):
         self.sf = common.sf
-        self.patch_size = common.patch_size
+        self.patch_size = dataset.patch_size
         self.rand_crop = False if self.patch_size == -1 else True
 
         self.hrfiles = [
@@ -53,6 +53,9 @@ class ImagePairDataset(Dataset):
             for x in os.listdir(dataset.lr_dir)
             if check_image_file(x)
         ]
+
+        self.hrfiles.sort()
+        self.lrfiles.sort()
 
         assert len(self.hrfiles) == len(
             self.lrfiles

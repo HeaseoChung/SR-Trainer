@@ -3,6 +3,7 @@ import builtins
 import torch
 import torch.distributed as dist
 import torchvision.utils as vutils
+import wandb
 
 from torch import nn
 from torch.utils.data.dataloader import DataLoader
@@ -37,6 +38,14 @@ class Trainer:
         self.end_iters = cfg.train.common.iteration
         self.seed = cfg.train.common.seed
         self.use_wandb = cfg.train.common.use_wandb
+
+        if self.use_wandb:
+            wandb.init(
+                project=f"{cfg.train.common.method}_{cfg.models.generator.name}"
+            )
+            wandb.config.update(cfg)
+
+        self.save_log_every = cfg.train.common.save_log_every
         self.save_img_every = cfg.train.common.save_img_every
         self.save_model_every = cfg.train.common.save_model_every
 
@@ -109,6 +118,7 @@ class Trainer:
                     yield batch
 
         cfg.train.dataset.common.sf = self.scale
+
         train_dataset = define_dataset(
             cfg.train.dataset.common, cfg.train.dataset.train
         )
@@ -219,17 +229,17 @@ class Trainer:
         else:
             state_dict = model.state_dict()
 
+        if len(self.avgerage) <= 0:
+            for m in self.metrics:
+                self.avgerage[m.name] = 0
+
         for m in self.metrics:
-            if len(self.avgerage) <= 0:
-                for m in self.metrics:
-                    self.avgerage[m.name] = 0
-            else:
-                if average[m.name] > self.avgerage[m.name]:
-                    self.avgerage[m.name] = average[m.name]
-                    torch.save(
-                        state_dict,
-                        os.path.join(self.save_path, f"best_{m.name}.pth"),
-                    )
+            if average[m.name] > self.avgerage[m.name]:
+                self.avgerage[m.name] = average[m.name]
+                torch.save(
+                    state_dict,
+                    os.path.join(self.save_path, f"best_{m.name}.pth"),
+                )
 
         torch.save(
             {
@@ -239,3 +249,9 @@ class Trainer:
             },
             os.path.join(self.save_path, f"{name}_{str(iter).zfill(6)}.pth"),
         )
+
+    def _print(self, log):
+        if self.use_wandb:
+            wandb.log(log)
+        else:
+            print(log)

@@ -3,9 +3,18 @@ import erqa
 import numpy as np
 import torch
 import torch.nn.functional as F
+import pyiqa
+
 from torch.autograd import Variable
 from math import exp
 
+class NIQE:
+    def __init__(self):
+        self.name = "NIQE"
+        self.niqe = pyiqa.create_metric("niqe")
+
+    def __call__(self, img1, img2):
+        return self.niqe(img1, img2)
 
 class PSNR:
     """Peak Signal to Noise Ratio

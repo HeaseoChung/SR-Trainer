@@ -1,9 +1,10 @@
 common:
   iteration: 800001
+  save_log_every: 100
   save_img_every: 1000
   save_model_every: 10000
   seed: 123
-  use_wandb: false
+  use_wandb: true
   ckpt_dir: "kd_cpkt"
   save_img_dir: "images"
   method: KD
@@ -16,7 +17,12 @@ ddp:
   dist_backend: "nccl"
 
 loss:
-  lists: ["MAE"] #MAE, "PerceptualLoss"
+  lists: ["MAE", "Wavelet"] #MAE, "PerceptualLoss"
+  WaveletLoss:
+    type: 'db4'
+    level: 3
+    pad: 'zero'
+    alpha: 0
   GANLoss:
     real_label_val: 1.0
     fake_label_val: 0.0
@@ -54,13 +60,11 @@ metrics:
 dataset:
   common:
     sf: -1
-    gt_size: 320
-    patch_size : 128
-
   test:
     type: ImagePairDataset
-    hr_dir: /dataset/SR/valid/HR
-    lr_dir: /dataset/SR/valid/LR
+    hr_dir: /dataset/SR/DIV2KRK/gt
+    lr_dir: /dataset/SR/DIV2KRK/lr_x2
+    patch_size : -1
     batch_size: 1
     num_workers: 2
 
@@ -68,10 +72,10 @@ dataset:
     type: ImagePairDegradationDataset
     hr_dir: /dataset/SR/train
     lr_dir: ""
-    num_workers: 8
-    batch_size: 8
-    patch_size : 128
     gt_size: 320
+    patch_size : 256
+    batch_size: 16
+    num_workers: 8
 
     ImagePairDegradationDataset: 
       sharpen:
@@ -84,8 +88,8 @@ dataset:
         use: true
         plus: false
         processes : [
-          "blur_1",
-          "blur_2",
+          # "blur_1",
+          # "blur_2",
           "resize_1",
           "resize_2",
           "gaussian_noise_1",

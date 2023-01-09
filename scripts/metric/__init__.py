@@ -12,6 +12,8 @@ def define_metrics(cfg):
             metrics.append(LPIPS())
         elif m == "erqa":
             metrics.append(ERQA())
+        elif m == "niqe":
+            metrics.append(NIQE())
 
     print(f"Metrics: {cfg.metrics.types} is going to be used")
     return metrics

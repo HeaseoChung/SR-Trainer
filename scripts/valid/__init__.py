@@ -72,5 +72,15 @@ class Valider:
     def _init_metrics(self, cfg):
         self.metrics = define_metrics(cfg.valid)
 
-    def _visualize(self, i, img1):
-        vutils.save_image(img1, os.path.join(self.save_path, f"preds_{i}.png"))
+    def _visualize(self, i, img1, img2, img3):
+        results = torch.cat(
+            (
+                img1.detach(),
+                img2.detach(),
+                img3.detach(),
+            ),
+            3,
+        )
+        vutils.save_image(
+            results, os.path.join(self.save_path, f"compare_{i}.png")
+        )

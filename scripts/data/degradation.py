@@ -23,8 +23,8 @@ from data.augmentation import (
 class Degradation:
     def __init__(self, common, dataset):
         self.sf = common.sf
-        self.patch_size = common.patch_size
-        self.gt_size = common.gt_size
+        self.patch_size = dataset.patch_size
+        self.gt_size = dataset.gt_size
         self.shuffle_prob = dataset.ImagePairDegradationDataset.deg.shuffle_prob
         self.num_deg = 7
         self.num_deg_plus = 9
@@ -249,8 +249,8 @@ class Degradation:
         lr = cv2.resize(
             lr,
             (
-                self.gt_size//2,
-                self.gt_size//2,
+                self.gt_size // 2,
+                self.gt_size // 2,
             ),
             interpolation=random.choice([1, 2, 3]),
         )
@@ -259,8 +259,8 @@ class Degradation:
             hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
         )
 
-        if random.random() < 0.1:
-            lr = self.add_interlace(lr)
+        # if random.random() < 0.1:
+        #     lr = self.add_interlace(lr)
 
         lr = single2uint(lr)
         hr = single2uint(hr)

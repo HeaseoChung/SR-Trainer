@@ -11,8 +11,8 @@
 - [Citation](#citation)
 
 ## Updates
+- **_News (2023-01-01)_**: Implemented Wandb to monitor status of training
 - **_News (2023-01-01)_**: Implemented Knowledge Distillation
-- **_News (2022-12-30)_**: Refactoring codes for tester and metricer
 - **_News (2022-12-30)_**: Refactoring codes for tester and metricer
 - **_News (2022-12-30)_**: Refactored codes for train
 - **_News (2022-12-22)_**: Implemented interlace degradation

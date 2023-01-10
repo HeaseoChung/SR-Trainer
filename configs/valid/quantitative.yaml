@@ -5,14 +5,14 @@ common:
 dataset:
   common:
     sf: 2
-    patch_size : -1
 
   valid:
     type: ImagePairDataset
-    hr_dir: /dataset/SR/deg/HR
-    lr_dir: /dataset/SR/deg/LR
+    hr_dir: /dataset/SR/DIV2KRK/gt/
+    lr_dir: /dataset/SR/DIV2KRK/lr_x2/
+    patch_size : -1
     batch_size: 1
     num_workers: 4
 
 metrics: 
-  types: [psnr, ssim, lpips]
+  types: [psnr, ssim, niqe]

@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 
 
-class L1_Charbonnier_loss(nn.Module):
+class Charbonnier_loss(nn.Module):
     """L1 Charbonnierloss."""
 
     def __init__(self):
-        super(L1_Charbonnier_loss, self).__init__()
+        super(Charbonnier_loss, self).__init__()
         self.eps = 1e-6
 
     def forward(self, X, Y):

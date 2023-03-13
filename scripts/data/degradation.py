@@ -249,8 +249,8 @@ class Degradation:
         lr = cv2.resize(
             lr,
             (
-                self.gt_size // 2,
-                self.gt_size // 2,
+                self.gt_size // self.sf,
+                self.gt_size // self.sf,
             ),
             interpolation=random.choice([1, 2, 3]),
         )

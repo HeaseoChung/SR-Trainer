@@ -38,16 +38,8 @@ def main(cfg):
         )
         dist.destroy_process_group()
     else:
-        print("Train with single GPUs")
-        if cfg.train.common.method == "NET":
-            trainer(0, cfg)
-        elif cfg.train.common.method == "GAN":
-            trainer(0, cfg)
-        elif cfg.train.common.method == "KD":
-            trainer(0, cfg)
+        trainer(0, cfg)
 
 
-# GPU5 1595566 NET Block4 deg true
-# GPU6 1609991 KD (Block4 - Block1) deg true
 if __name__ == "__main__":
     main()

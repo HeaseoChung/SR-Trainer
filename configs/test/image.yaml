@@ -1,4 +1,4 @@
 common:
   type: "image"
-  image_path: "/workspace/SuperResolution/example/LGU/20220718/drama"
+  image_path: ""
   save_path: "results"

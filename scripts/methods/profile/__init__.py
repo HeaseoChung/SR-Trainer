@@ -50,7 +50,8 @@ class Profiler(Base):
 
         # GPU Warming up
         for _ in range(10):
-            self.generator(inputs)
+            with torch.no_grad():
+                self.generator(inputs)
 
         with torch.no_grad():
             start.record()

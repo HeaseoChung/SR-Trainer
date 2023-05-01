@@ -122,140 +122,126 @@ class Degradation:
         if self.sharpen:
             hr = self.add_sharpen(hr)
 
-        if self.deg:
-            if self.plus:
-                if random.random() < self.shuffle_prob:
-                    shuffle_order = self.deg_processes
-                else:
-                    shuffle_order = self.deg_processes
-                    shuffle_order[0 : self.num_half_deg] = random.sample(
-                        shuffle_order[0 : self.num_half_deg],
-                        len(shuffle_order[0 : self.num_half_deg]),
-                    )
-                    shuffle_order[self.num_half_deg :] = random.sample(
-                        shuffle_order[self.num_half_deg :],
-                        len(shuffle_order[self.num_half_deg :]),
-                    )
-
-                for deg in shuffle_order:
-                    ### first phase of degradation
-                    if deg == "blur_1":
-                        lr = self.generate_kernel1(lr)
-                    elif deg == "resize_1":
-                        if random.random() < 0.75:
-                            lr = self.random_resizing(lr)
-                        else:
-                            k = self.fspecial_gaussian(
-                                25,
-                                random.uniform(0.1, 0.6 * self.sf),
-                            )
-                            k_shifted = self.shift_pixel(k, self.sf)
-                            k_shifted = (
-                                k_shifted / k_shifted.sum()
-                            )  # blur with shifted kernel
-                            lr = ndimage.filters.convolve(
-                                lr,
-                                np.expand_dims(k_shifted, axis=2),
-                                mode="mirror",
-                            )
-                            lr = lr[0 :: self.sf, 0 :: self.sf, ...]
-                    elif deg == "gaussian_noise_1":
-                        lr = self.add_Gaussian_noise(lr)
-                    elif deg == "poisson_noise_1":
-                        if random.random() < 0.1:
-                            lr = self.add_Poisson_noise(lr)
-                    elif deg == "sparkle_noise_1":
-                        if random.random() < 0.1:
-                            lr = self.add_speckle_noise(lr)
-
-                    ### second phase of degradation
-                    elif deg == "blur_2":
-                        lr = self.generate_kernel2(lr)
-                    elif deg == "resize_2":
-                        lr = self.random_resizing2(lr)
-                    elif deg == "gaussian_noise_2":
-                        if random.random() < 0.1:
-                            lr = self.add_Poisson_noise(lr)
-                    elif deg == "poisson_noise_2":
-                        if random.random() < 0.1:
-                            lr = self.add_Gaussian_noise(lr)
-                    elif deg == "sparkle_noise_2":
-                        if random.random() < 0.1:
-                            lr = self.add_speckle_noise(lr)
-
-                if np.random.uniform() < 0.5:
-                    lr = self.generate_sinc(lr)
-                    lr = self.add_JPEG_noise(lr)
-                else:
-                    lr = self.add_JPEG_noise(lr)
-                    lr = self.generate_sinc(lr)
+        if self.plus:
+            if random.random() < self.shuffle_prob:
+                shuffle_order = self.deg_processes
             else:
-                shuffle_order = random.sample(
-                    self.deg_processes,
-                    len(self.deg_processes),
+                shuffle_order = self.deg_processes
+                shuffle_order[0 : self.num_half_deg] = random.sample(
+                    shuffle_order[0 : self.num_half_deg],
+                    len(shuffle_order[0 : self.num_half_deg]),
                 )
-                for deg in shuffle_order:
-                    if deg == "blur_1":
-                        lr = self.add_blur(lr, self.sf)
-                    elif deg == "blur_2":
-                        lr = self.add_blur(lr, self.sf)
-                    elif deg == "resize_1":
-                        a, b = lr.shape[1], lr.shape[0]
-                        if random.random() < 0.75:
-                            sf1 = random.uniform(1, 2 * self.sf)
-                            lr = cv2.resize(
-                                lr,
-                                (
-                                    int(1 / sf1 * lr.shape[1]),
-                                    int(1 / sf1 * lr.shape[0]),
-                                ),
-                                interpolation=random.choice([1, 2, 3]),
-                            )
-                        else:
-                            k = self.fspecial_gaussian(
-                                25, random.uniform(0.1, 0.6 * self.sf)
-                            )
-                            k_shifted = self.shift_pixel(k, self.sf)
-                            k_shifted = k_shifted / k_shifted.sum()
-                            lr = ndimage.filters.convolve(
-                                lr,
-                                np.expand_dims(k_shifted, axis=2),
-                                mode="mirror",
-                            )
-                            lr = lr[0 :: self.sf, 0 :: self.sf, ...]
-                        lr = np.clip(lr, 0.0, 1.0)
-                    elif deg == "resize_2":
-                        a, b = lr.shape[1], lr.shape[0]
+                shuffle_order[self.num_half_deg :] = random.sample(
+                    shuffle_order[self.num_half_deg :],
+                    len(shuffle_order[self.num_half_deg :]),
+                )
+
+            for deg in shuffle_order:
+                ### first phase of degradation
+                if deg == "blur_1":
+                    lr = self.generate_kernel1(lr)
+                elif deg == "resize_1":
+                    if random.random() < 0.75:
+                        lr = self.random_resizing(lr)
+                    else:
+                        k = self.fspecial_gaussian(
+                            25,
+                            random.uniform(0.1, 0.6 * self.sf),
+                        )
+                        k_shifted = self.shift_pixel(k, self.sf)
+                        k_shifted = (
+                            k_shifted / k_shifted.sum()
+                        )  # blur with shifted kernel
+                        lr = ndimage.filters.convolve(
+                            lr,
+                            np.expand_dims(k_shifted, axis=2),
+                            mode="mirror",
+                        )
+                        lr = lr[0 :: self.sf, 0 :: self.sf, ...]
+                elif deg == "gaussian_noise_1":
+                    lr = self.add_Gaussian_noise(lr)
+                elif deg == "poisson_noise_1":
+                    if random.random() < 0.1:
+                        lr = self.add_Poisson_noise(lr)
+                elif deg == "sparkle_noise_1":
+                    if random.random() < 0.1:
+                        lr = self.add_speckle_noise(lr)
+
+                ### second phase of degradation
+                elif deg == "blur_2":
+                    lr = self.generate_kernel2(lr)
+                elif deg == "resize_2":
+                    lr = self.random_resizing2(lr)
+                elif deg == "gaussian_noise_2":
+                    if random.random() < 0.1:
+                        lr = self.add_Poisson_noise(lr)
+                elif deg == "poisson_noise_2":
+                    if random.random() < 0.1:
+                        lr = self.add_Gaussian_noise(lr)
+                elif deg == "sparkle_noise_2":
+                    if random.random() < 0.1:
+                        lr = self.add_speckle_noise(lr)
+
+            if np.random.uniform() < 0.5:
+                lr = self.generate_sinc(lr)
+                lr = self.add_JPEG_noise(lr)
+            else:
+                lr = self.add_JPEG_noise(lr)
+                lr = self.generate_sinc(lr)
+        else:
+            shuffle_order = random.sample(
+                self.deg_processes,
+                len(self.deg_processes),
+            )
+            for deg in shuffle_order:
+                if deg == "blur_1":
+                    lr = self.add_blur(lr, self.sf)
+                elif deg == "blur_2":
+                    lr = self.add_blur(lr, self.sf)
+                elif deg == "resize_1":
+                    a, b = lr.shape[1], lr.shape[0]
+                    if random.random() < 0.75:
+                        sf1 = random.uniform(1, 2 * self.sf)
                         lr = cv2.resize(
                             lr,
-                            (int(1 / self.sf * a), int(1 / self.sf * b)),
+                            (
+                                int(1 / sf1 * lr.shape[1]),
+                                int(1 / sf1 * lr.shape[0]),
+                            ),
                             interpolation=random.choice([1, 2, 3]),
                         )
-                        lr = np.clip(lr, 0.0, 1.0)
-                    elif deg == "gaussian_noise_1":
-                        lr = self.add_Gaussian_noise(lr)
-                    elif deg == "poisson_noise_1":
-                        if random.random() < 0.1:
-                            lr = self.add_Poisson_noise(lr)
-                    elif deg == "sparkle_noise_1":
-                        if random.random() < 0.1:
-                            lr = self.add_speckle_noise(lr)
-                    elif deg == "jpeg_noise_1":
-                        if random.random() < 0.9:
-                            lr = self.add_JPEG_noise(lr)
-
-        lr = cv2.resize(
-            lr,
-            (
-                self.gt_size // self.sf,
-                self.gt_size // self.sf,
-            ),
-            interpolation=random.choice([1, 2, 3]),
-        )
-
-        hr, lr = random_crop(
-            hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
-        )
+                    else:
+                        k = self.fspecial_gaussian(
+                            25, random.uniform(0.1, 0.6 * self.sf)
+                        )
+                        k_shifted = self.shift_pixel(k, self.sf)
+                        k_shifted = k_shifted / k_shifted.sum()
+                        lr = ndimage.filters.convolve(
+                            lr,
+                            np.expand_dims(k_shifted, axis=2),
+                            mode="mirror",
+                        )
+                        lr = lr[0 :: self.sf, 0 :: self.sf, ...]
+                    lr = np.clip(lr, 0.0, 1.0)
+                elif deg == "resize_2":
+                    a, b = lr.shape[1], lr.shape[0]
+                    lr = cv2.resize(
+                        lr,
+                        (int(1 / self.sf * a), int(1 / self.sf * b)),
+                        interpolation=random.choice([1, 2, 3]),
+                    )
+                    lr = np.clip(lr, 0.0, 1.0)
+                elif deg == "gaussian_noise_1":
+                    lr = self.add_Gaussian_noise(lr)
+                elif deg == "poisson_noise_1":
+                    if random.random() < 0.1:
+                        lr = self.add_Poisson_noise(lr)
+                elif deg == "sparkle_noise_1":
+                    if random.random() < 0.1:
+                        lr = self.add_speckle_noise(lr)
+                elif deg == "jpeg_noise_1":
+                    if random.random() < 0.9:
+                        lr = self.add_JPEG_noise(lr)
 
         # if random.random() < 0.1:
         #     lr = self.add_interlace(lr)

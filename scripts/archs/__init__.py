@@ -27,6 +27,19 @@ def define_model(configs, gpu):
         from archs.SwinIR.models import Generator
 
         model = Generator(configs).to(gpu)
+    elif model_name == "ecbsr":
+        from archs.ECBSR.models import Generator
+
+        model = Generator(configs).to(gpu)
+    elif model_name == "rlfn":
+        from archs.RLFN.models import Generator
+
+        model = Generator(configs).to(gpu)
+
+    elif model_name == "rrsr":
+        from archs.RRSR.models import Generator
+
+        model = Generator(configs).to(gpu)
 
     elif model_name == "unet_discriminator":
         from archs.Discriminators.unet_discriminator import Discriminator

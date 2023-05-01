@@ -8,8 +8,8 @@ import torchvision.utils as vutils
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from data.degradation import Degradation
-from data.augmentation import random_roate, random_crop
-from data.utils import load_image_file
+from data.augmentation import *
+from data.utils import load_image_file, modcrop
 
 
 class ImageDegradationDataset(Dataset):
@@ -26,6 +26,45 @@ class ImageDegradationDataset(Dataset):
         hr = cv2.cvtColor(hr, cv2.COLOR_BGR2RGB)
 
         lr, hr = self.data_pipeline.data_pipeline(hr)
+        return self.to_tensor(lr), self.to_tensor(hr)
+
+    def __len__(self):
+        return self.len
+
+
+class ImageDataset(Dataset):
+    def __init__(self, common, dataset):
+        self.hrfiles = load_image_file(dataset.hr_dir)
+        self.sf = common.sf
+        self.gt_size = dataset.gt_size
+        self.patch_size = dataset.patch_size
+
+        self.len = len(self.hrfiles)
+        self.to_tensor = transforms.ToTensor()
+
+    def __getitem__(self, index):
+        hr = cv2.imread(self.hrfiles[index])
+        hr = cv2.cvtColor(hr, cv2.COLOR_BGR2RGB)
+        hr, _ = random_crop(hr=hr, lr=None, crop_size=self.gt_size, sf=self.sf)
+        hr = random_roate(hr)
+        hr = random_hflip(hr)
+        hr = random_vflip(hr)
+        hr = modcrop(hr, self.sf)
+        h, w = hr.shape[:2]
+
+        lr = cv2.resize(
+            hr,
+            (
+                w // self.sf,
+                h // self.sf,
+            ),
+            interpolation=cv2.INTER_CUBIC,
+        )
+
+        hr, lr = random_crop(
+            hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
+        )
+
         return self.to_tensor(lr), self.to_tensor(hr)
 
     def __len__(self):

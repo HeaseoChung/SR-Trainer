@@ -1,4 +1,4 @@
-from data.dataset import ImageDegradationDataset, ImagePairDataset
+from data.dataset import *
 
 
 def define_dataset(common, dataset):
@@ -8,3 +8,5 @@ def define_dataset(common, dataset):
         return ImageDegradationDataset(common, dataset)
     elif dataset_name == "ImagePairDataset":
         return ImagePairDataset(common, dataset)
+    elif dataset_name == "ImageDataset":
+        return ImageDataset(common, dataset)

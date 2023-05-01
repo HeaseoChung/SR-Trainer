@@ -1,15 +1,21 @@
 import torch
 from torch import tensor
 from torch.autograd import Function
-from train.loss.pytorch_wavelets.dtcwt.lowlevel import colfilter, rowfilter
-from train.loss.pytorch_wavelets.dtcwt.lowlevel import coldfilt, rowdfilt
-from train.loss.pytorch_wavelets.dtcwt.lowlevel import (
+from methods.train.loss.pytorch_wavelets.dtcwt.lowlevel import (
+    colfilter,
+    rowfilter,
+)
+from methods.train.loss.pytorch_wavelets.dtcwt.lowlevel import (
+    coldfilt,
+    rowdfilt,
+)
+from methods.train.loss.pytorch_wavelets.dtcwt.lowlevel import (
     colifilt,
     rowifilt,
     q2c,
     c2q,
 )
-from train.loss.pytorch_wavelets.dwt.lowlevel import int_to_mode
+from methods.train.loss.pytorch_wavelets.dwt.lowlevel import int_to_mode
 
 
 def get_dimensions5(o_dim, ri_dim):

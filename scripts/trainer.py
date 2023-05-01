@@ -5,9 +5,9 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 import numpy as np
 
-from train.net import Net
-from train.gan import GAN
-from train.kd import KD
+from methods.train.net import Net
+from methods.train.gan import GAN
+from methods.train.kd import KD
 
 
 @hydra.main(config_path="../configs/", config_name="train.yaml")

@@ -9,19 +9,14 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from data.degradation import Degradation
 from data.augmentation import random_roate, random_crop
-from data.utils import check_image_file
+from data.utils import load_image_file
 
 
-class ImagePairDegradationDataset(Dataset):
+class ImageDegradationDataset(Dataset):
     def __init__(self, common, dataset):
-
         self.data_pipeline = Degradation(common, dataset)
 
-        self.hrfiles = [
-            os.path.join(dataset.hr_dir, x)
-            for x in os.listdir(dataset.hr_dir)
-            if check_image_file(x)
-        ]
+        self.hrfiles = load_image_file(dataset.hr_dir)
 
         self.len = len(self.hrfiles)
         self.to_tensor = transforms.ToTensor()
@@ -43,16 +38,8 @@ class ImagePairDataset(Dataset):
         self.patch_size = dataset.patch_size
         self.rand_crop = False if self.patch_size == -1 else True
 
-        self.hrfiles = [
-            os.path.join(dataset.hr_dir, x)
-            for x in os.listdir(dataset.hr_dir)
-            if check_image_file(x)
-        ]
-        self.lrfiles = [
-            os.path.join(dataset.lr_dir, x)
-            for x in os.listdir(dataset.lr_dir)
-            if check_image_file(x)
-        ]
+        self.hrfiles = load_image_file(dataset.hr_dir)
+        self.lrfiles = load_image_file(dataset.lr_dir)
 
         self.hrfiles.sort()
         self.lrfiles.sort()

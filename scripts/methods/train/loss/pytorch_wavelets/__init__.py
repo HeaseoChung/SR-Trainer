@@ -18,17 +18,23 @@ __all__ = [
     "ScatLayerj2",
 ]
 
-from train.loss.pytorch_wavelets._version import __version__
-from train.loss.pytorch_wavelets.dtcwt.transform2d import (
+from methods.train.loss.pytorch_wavelets._version import __version__
+from methods.train.loss.pytorch_wavelets.dtcwt.transform2d import (
     DTCWTForward,
     DTCWTInverse,
 )
-from train.loss.pytorch_wavelets.dwt.transform2d import DWTForward, DWTInverse
-from train.loss.pytorch_wavelets.dwt.transform1d import (
+from methods.train.loss.pytorch_wavelets.dwt.transform2d import (
+    DWTForward,
+    DWTInverse,
+)
+from methods.train.loss.pytorch_wavelets.dwt.transform1d import (
     DWT1DForward,
     DWT1DInverse,
 )
-from train.loss.pytorch_wavelets.scatternet import ScatLayer, ScatLayerj2
+from methods.train.loss.pytorch_wavelets.scatternet import (
+    ScatLayer,
+    ScatLayerj2,
+)
 
 # Some aliases
 DTCWT = DTCWTForward

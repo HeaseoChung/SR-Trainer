@@ -1,12 +1,12 @@
-from train import Trainer
+from methods.train import Trainer
 from torch.nn import functional as F
 
 
 class KD(Trainer):
     def __init__(self, gpu, cfg):
         super().__init__(gpu, cfg)
-        self.teacher = self._init_model(cfg.models.teacher)
-        self.student = self._init_model(cfg.models.student)
+        self.teacher = self._init_model(cfg.models.teacher, cfg)
+        self.student = self._init_model(cfg.models.student, cfg)
 
         if cfg.train.ddp.distributed:
             self.teacher = self._init_distributed_data_parallel(
@@ -41,7 +41,7 @@ class KD(Trainer):
             self._train(i)
 
             if i % self.save_model_every == 0 and self.gpu == 0:
-                average = self._test(self.student)
+                average = self._valid(self.student)
                 self._print(average)
                 self._save_model("g", i, self.student, self.s_optim, average)
 
@@ -81,4 +81,4 @@ class KD(Trainer):
             self._print(losses)
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
-            self._visualize(hr, t_preds, s_preds)
+            self._visualize(iter, [hr, t_preds, s_preds])

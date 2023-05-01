@@ -1,11 +1,11 @@
 import torch.nn as nn
 import pywt
-import train.loss.pytorch_wavelets.dwt.lowlevel as lowlevel
+import methods.train.loss.pytorch_wavelets.dwt.lowlevel as lowlevel
 import torch
 
 
 class DWT1DForward(nn.Module):
-    """ Performs a 1d DWT Forward decomposition of an image
+    """Performs a 1d DWT Forward decomposition of an image
 
     Args:
         J (int): Number of levels of decomposition
@@ -16,8 +16,9 @@ class DWT1DForward(nn.Module):
             3) a tuple of numpy arrays (h0, h1)
         mode (str): 'zero', 'symmetric', 'reflect' or 'periodization'. The
             padding scheme
-        """
-    def __init__(self, J=1, wave='db1', mode='zero'):
+    """
+
+    def __init__(self, J=1, wave="db1", mode="zero"):
         super().__init__()
         if isinstance(wave, str):
             wave = pywt.Wavelet(wave)
@@ -29,13 +30,13 @@ class DWT1DForward(nn.Module):
 
         # Prepare the filters - this makes them into column filters
         filts = lowlevel.prep_filt_afb1d(h0, h1)
-        self.register_buffer('h0', filts[0])
-        self.register_buffer('h1', filts[1])
+        self.register_buffer("h0", filts[0])
+        self.register_buffer("h1", filts[1])
         self.J = J
         self.mode = mode
 
     def forward(self, x):
-        """ Forward pass of the DWT.
+        """Forward pass of the DWT.
 
         Args:
             x (tensor): Input of shape :math:`(N, C_{in}, L_{in})`
@@ -60,7 +61,7 @@ class DWT1DForward(nn.Module):
 
 
 class DWT1DInverse(nn.Module):
-    """ Performs a 1d DWT Inverse reconstruction of an image
+    """Performs a 1d DWT Inverse reconstruction of an image
 
     Args:
         wave (str or pywt.Wavelet or tuple(ndarray)): Which wavelet to use.
@@ -71,7 +72,8 @@ class DWT1DInverse(nn.Module):
         mode (str): 'zero', 'symmetric', 'reflect' or 'periodization'. The
             padding scheme
     """
-    def __init__(self, wave='db1', mode='zero'):
+
+    def __init__(self, wave="db1", mode="zero"):
         super().__init__()
         if isinstance(wave, str):
             wave = pywt.Wavelet(wave)
@@ -83,8 +85,8 @@ class DWT1DInverse(nn.Module):
 
         # Prepare the filters
         filts = lowlevel.prep_filt_sfb1d(g0, g1)
-        self.register_buffer('g0', filts[0])
-        self.register_buffer('g1', filts[1])
+        self.register_buffer("g0", filts[0])
+        self.register_buffer("g1", filts[1])
         self.mode = mode
 
     def forward(self, coeffs):

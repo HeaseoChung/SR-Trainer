@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import torch
 import torch.nn.functional as F
 import numpy as np
-from train.loss.pytorch_wavelets.utils import symm_pad_1d as symm_pad
+from methods.train.loss.pytorch_wavelets.utils import symm_pad_1d as symm_pad
 
 
 def as_column_vector(v):

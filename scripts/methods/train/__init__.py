@@ -7,23 +7,23 @@ import wandb
 
 from torch import nn
 from torch.utils.data.dataloader import DataLoader
-from data import define_dataset
 from archs import define_model
-from train.loss import define_loss
-from train.optim import define_optim
-from train.learning_rate_scheduler import define_LR_scheduler
-from metric import define_metrics
+from data import define_dataset
+from data.utils import postprocess, modcrop
+
+from methods import Base
+from methods.train.loss import define_loss
+from methods.train.optim import define_optim
+from methods.train.learning_rate_scheduler import define_LR_scheduler
+from methods.metric import define_metrics
 
 
-class Trainer:
+class Trainer(Base):
     def __init__(self, gpu, cfg):
+        super().__init__(gpu, cfg)
         print(f"Train Method: {cfg.train.common.method} is going to be used")
 
-        ### GPU Device setting
-        self.gpu = gpu
-        self.ngpus_per_node = torch.cuda.device_count()
-        self.scale = cfg.models.generator.scale
-
+        ### Common setting
         if cfg.train.ddp.distributed and self.gpu != 0:
 
             def print_pass(*args):
@@ -31,27 +31,20 @@ class Trainer:
 
             builtins.print = print_pass
 
-        ### Common setting
         self.save_path = cfg.train.common.ckpt_dir
         os.makedirs(self.save_path, exist_ok=True)
         self.start_iters = 0
         self.end_iters = cfg.train.common.iteration
         self.seed = cfg.train.common.seed
         self.use_wandb = cfg.train.common.use_wandb
-
+        self.train_method = cfg.train.common.method
         if self.use_wandb:
-            wandb.init(
-                project=f"{cfg.train.common.method}_{cfg.models.generator.name}"
-            )
+            wandb.init(project=f"NET_{cfg.models.generator.name}")
             wandb.config.update(cfg)
 
         self.save_log_every = cfg.train.common.save_log_every
         self.save_img_every = cfg.train.common.save_img_every
         self.save_model_every = cfg.train.common.save_model_every
-
-        ### Model setting
-        self.generator = None
-        self.discriminator = None
 
         ### Optimizer setting
         self.g_optim = None
@@ -69,36 +62,38 @@ class Trainer:
         ### Dataset setting
         self.distributed = cfg.train.ddp.distributed
         self.train_dataloader = None
-        self.test_dataloader = None
+        self.valid_dataloader = None
 
         ### Metrics setting
         self.metrics = None
         self.avgerage = {}
 
-    def _init_model(self, cfg):
-        return define_model(cfg, self.gpu)
+    def _init_model(self, cfg_model, cfg_train):
+        model = define_model(cfg_model, self.gpu)
+        if cfg_train.train.ddp.distributed:
+            print("Init distributed data parallel")
+            model = self._init_distributed_data_parallel(cfg_train, model)
+        return model
 
     def _load_state_dict(self, path, model, optim):
         if path:
             print(
-                f"State dictionary: Checkpoint is going to be used, Loading the checkpoint from : {path}"
+                f"Load Checkpoint: Checkpoint is going to be used, Loading the checkpoint from : {path}"
             )
             ckpt = torch.load(
                 path,
                 map_location=lambda storage, loc: storage,
             )
             if len(ckpt) == 3:
-                if isinstance(model, nn.DataParallel):
-                    model.module.load_state_dict(ckpt["model"])
-                else:
-                    model.load_state_dict(ckpt["model"])
-                optim.load_state_dict(ckpt["optimimizer"])
-                self.start_iters = ckpt["iteration"] + 1
+                model.load_state_dict(ckpt["model"])
+                if self.train_method == "NET":
+                    optim.load_state_dict(ckpt["optimimizer"])
+                    self.start_iters = ckpt["iteration"] + 1
             else:
                 model.load_state_dict(ckpt)
         else:
             self.start_iters = 0
-            print("State dictionary: Checkpoint is not going to be used")
+            print("Load Checkpoint: Checkpoint is not going to be used")
 
         return model, optim
 
@@ -122,15 +117,15 @@ class Trainer:
         train_dataset = define_dataset(
             cfg.train.dataset.common, cfg.train.dataset.train
         )
-        test_dataset = define_dataset(
-            cfg.train.dataset.common, cfg.train.dataset.test
+        valid_dataset = define_dataset(
+            cfg.train.dataset.common, cfg.train.dataset.valid
         )
 
         train_num_workers = (
             cfg.train.dataset.train.num_workers * torch.cuda.device_count()
         )
-        test_num_workers = (
-            cfg.train.dataset.test.num_workers * torch.cuda.device_count()
+        valid_num_workers = (
+            cfg.train.dataset.valid.num_workers * torch.cuda.device_count()
         )
 
         if self.distributed:
@@ -138,9 +133,13 @@ class Trainer:
                 train_dataset,
                 num_replicas=cfg.train.ddp.world_size,
                 rank=self.gpu,
+                shuffle=True,
             )
         else:
             train_sampler = None
+
+        print(f"Number of train_dataset :{len(train_dataset)}")
+        print(f"Number of valid_dataset :{len(valid_dataset)}")
 
         train_dataloader = DataLoader(
             dataset=train_dataset,
@@ -153,18 +152,17 @@ class Trainer:
         )
 
         self.train_dataloader = sample_data(train_dataloader)
-        self.test_dataloader = DataLoader(
-            dataset=test_dataset,
-            batch_size=cfg.train.dataset.test.batch_size,
+        self.valid_dataloader = DataLoader(
+            dataset=valid_dataset,
+            batch_size=cfg.train.dataset.valid.batch_size,
             shuffle=False,
-            num_workers=test_num_workers,
+            num_workers=valid_num_workers,
             pin_memory=True,
             sampler=None,
             drop_last=True,
         )
 
     def _init_distributed_data_parallel(self, cfg, model):
-
         dist.init_process_group(
             backend=cfg.train.ddp.dist_backend,
             init_method=cfg.train.ddp.dist_url,
@@ -175,8 +173,8 @@ class Trainer:
         torch.cuda.set_device(self.gpu)
         model.to(self.gpu)
 
-        cfg.train.dataset.batch_size = int(
-            cfg.train.dataset.batch_size / self.ngpus_per_node
+        cfg.train.dataset.train.batch_size = int(
+            cfg.train.dataset.train.batch_size / self.ngpus_per_node
         )
 
         model = torch.nn.parallel.DistributedDataParallel(
@@ -189,39 +187,43 @@ class Trainer:
     def _init_metrics(self, cfg):
         self.metrics = define_metrics(cfg.train)
 
-    def _test(self, model):
+    def _valid(self, model):
         model.eval()
         scores = {}
         average = {}
 
-        for m in self.metrics:
-            scores[m.name] = []
+        for k in self.metrics.keys():
+            scores[k] = []
 
-        for lr, hr in self.test_dataloader:
+        for lr, hr in self.valid_dataloader:
             lr = lr.to(self.gpu)
             hr = hr.to(self.gpu)
 
             with torch.no_grad():
                 preds = model(lr)
 
-            for m in self.metrics:
-                scores[m.name].append(m(preds, hr).item())
+            preds = postprocess(preds)
+            hr = postprocess(hr)
+            hr = modcrop(hr, self.scale)
 
-        for m in self.metrics:
-            average[m.name] = sum(scores[m.name]) / len(scores[m.name])
+            for k in self.metrics.keys():
+                scores[k].append(self.metrics[k](preds, hr, self.scale))
+
+        for k in self.metrics.keys():
+            average[k] = sum(scores[k]) / len(scores[k])
         return average
 
-    def _visualize(self, img1, img2, img3):
-        results = torch.cat(
-            (
-                img1.detach(),
-                img2.detach(),
-                img3.detach(),
-            ),
-            2,
-        )
+    def _visualize(self, iter, imgs):
+        results = None
 
-        vutils.save_image(results, os.path.join(self.save_path, f"compare.png"))
+        for img in imgs:
+            if results == None:
+                results = img
+            else:
+                results = torch.cat((results.detach(), img), 2)
+        vutils.save_image(
+            results, os.path.join(self.save_path, f"compare_{iter}.jpg")
+        )
 
     def _save_model(self, name, iter, model, optim, average):
         if isinstance(model, nn.DataParallel):
@@ -230,15 +232,15 @@ class Trainer:
             state_dict = model.state_dict()
 
         if len(self.avgerage) <= 0:
-            for m in self.metrics:
-                self.avgerage[m.name] = 0
+            for k in self.metrics.keys():
+                self.avgerage[k] = 0
 
-        for m in self.metrics:
-            if average[m.name] > self.avgerage[m.name]:
-                self.avgerage[m.name] = average[m.name]
+        for k in self.metrics.keys():
+            if average[k] > self.avgerage[k]:
+                self.avgerage[k] = average[k]
                 torch.save(
                     state_dict,
-                    os.path.join(self.save_path, f"best_{m.name}.pth"),
+                    os.path.join(self.save_path, f"best_{k}.pth"),
                 )
 
         torch.save(

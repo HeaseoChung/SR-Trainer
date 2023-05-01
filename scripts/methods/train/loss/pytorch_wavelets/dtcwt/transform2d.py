@@ -2,17 +2,28 @@ import torch
 import torch.nn as nn
 from numpy import ndarray, sqrt
 
-from train.loss.pytorch_wavelets.dtcwt.coeffs import (
+from methods.train.loss.pytorch_wavelets.dtcwt.coeffs import (
     qshift as _qshift,
     biort as _biort,
     level1,
 )
-from train.loss.pytorch_wavelets.dtcwt.lowlevel import prep_filt
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import FWD_J1, FWD_J2PLUS
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import INV_J1, INV_J2PLUS
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import get_dimensions6
-from train.loss.pytorch_wavelets.dwt.lowlevel import mode_to_int
-from train.loss.pytorch_wavelets.dwt.transform2d import DWTForward, DWTInverse
+from methods.train.loss.pytorch_wavelets.dtcwt.lowlevel import prep_filt
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+    FWD_J1,
+    FWD_J2PLUS,
+)
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+    INV_J1,
+    INV_J2PLUS,
+)
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+    get_dimensions6,
+)
+from methods.train.loss.pytorch_wavelets.dwt.lowlevel import mode_to_int
+from methods.train.loss.pytorch_wavelets.dwt.transform2d import (
+    DWTForward,
+    DWTInverse,
+)
 
 
 def pm(a, b):

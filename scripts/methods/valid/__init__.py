@@ -1,16 +1,20 @@
 import os
 import torch
 import torchvision.utils as vutils
+import pandas as pd
 
 from torch import nn
+from torch.nn import functional as F
 from torch.utils.data.dataloader import DataLoader
 from data import define_dataset
 from archs import define_model
 from metric import define_metrics
+from methods import Base
 
 
-class Valider:
+class Valider(Base):
     def __init__(self, gpu, cfg):
+        super().__init__(gpu, cfg)
         ### GPU Device setting
         self.gpu = gpu
         self.ngpus_per_node = torch.cuda.device_count()
@@ -29,6 +33,11 @@ class Valider:
 
         ### Metrics setting
         self.metrics = None
+
+        self._init_model(cfg)
+        self._init_dataset(cfg)
+        self._init_metrics(cfg)
+        self._run()
 
     def _init_model(self, cfg):
         return define_model(cfg, self.gpu)
@@ -53,13 +62,12 @@ class Valider:
         return model
 
     def _init_dataset(self, cfg):
-
         cfg.valid.dataset.common.sf = self.scale
         valid_dataset = define_dataset(
             cfg.valid.dataset.common, cfg.valid.dataset.valid
         )
 
-        self.valid_dataloader = DataLoader(
+        self.dataloader = DataLoader(
             dataset=valid_dataset,
             batch_size=cfg.valid.dataset.valid.batch_size,
             shuffle=None,
@@ -84,3 +92,26 @@ class Valider:
         vutils.save_image(
             results, os.path.join(self.save_path, f"compare_{i}.png")
         )
+
+    def _run(self):
+        self.generator.eval()
+        scores = {}
+
+        for m in self.metrics:
+            scores[m.name] = []
+
+        for i, (lr, hr) in enumerate(self.dataloader):
+            lr = lr.to(self.gpu)
+            hr = hr.to(self.gpu)
+
+            with torch.no_grad():
+                preds = self.generator(lr)
+
+            for m in self.metrics:
+                scores[m.name].append(m(preds, hr).item())
+
+            lr = F.interpolate(lr, scale_factor=self.scale, mode="nearest")
+            self._visualize(i, hr, lr, preds)
+
+        df = pd.DataFrame.from_dict(scores, orient="columns")
+        df.to_csv("Quantitative_Score.csv")

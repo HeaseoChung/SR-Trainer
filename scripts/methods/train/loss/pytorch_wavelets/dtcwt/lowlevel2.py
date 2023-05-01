@@ -6,18 +6,21 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from train.loss.pytorch_wavelets.dwt.lowlevel import roll, mypad
+from methods.train.loss.pytorch_wavelets.dwt.lowlevel import roll, mypad
 import pywt
-from train.loss.pytorch_wavelets.dwt.transform2d import DWTForward, DWTInverse
-from train.loss.pytorch_wavelets.dwt.lowlevel import (
+from methods.train.loss.pytorch_wavelets.dwt.transform2d import (
+    DWTForward,
+    DWTInverse,
+)
+from methods.train.loss.pytorch_wavelets.dwt.lowlevel import (
     afb2d,
     sfb2d_nonsep as sfb2d,
 )
-from train.loss.pytorch_wavelets.dwt.lowlevel import (
+from methods.train.loss.pytorch_wavelets.dwt.lowlevel import (
     prep_filt_afb2d,
     prep_filt_sfb2d_nonsep as prep_filt_sfb2d,
 )
-from train.loss.pytorch_wavelets.dtcwt.coeffs import (
+from methods.train.loss.pytorch_wavelets.dtcwt.coeffs import (
     level1 as _level1,
     qshift as _qshift,
     biort as _biort,

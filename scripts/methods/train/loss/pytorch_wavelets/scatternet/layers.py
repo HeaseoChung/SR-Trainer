@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
-from train.loss.pytorch_wavelets.dtcwt.coeffs import (
+from methods.train.loss.pytorch_wavelets.dtcwt.coeffs import (
     biort as _biort,
     qshift as _qshift,
 )
-from train.loss.pytorch_wavelets.dtcwt.lowlevel import prep_filt
+from methods.train.loss.pytorch_wavelets.dtcwt.lowlevel import prep_filt
 
 from .lowlevel import mode_to_int
 from .lowlevel import ScatLayerj1_f, ScatLayerj1_rot_f

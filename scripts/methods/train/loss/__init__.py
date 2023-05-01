@@ -1,8 +1,8 @@
 import torch.nn as nn
-from train.loss.l1_charbonnier_loss import Charbonnier_loss
-from train.loss.gan_loss import GANLoss
-from train.loss.perceptual_loss import PerceptualLoss
-from train.loss.pytorch_wavelets import DWTForward
+from methods.train.loss.l1_charbonnier_loss import Charbonnier_loss
+from methods.train.loss.gan_loss import GANLoss
+from methods.train.loss.perceptual_loss import PerceptualLoss
+from methods.train.loss.pytorch_wavelets import DWTForward
 
 
 def define_loss(cfg, gpu):

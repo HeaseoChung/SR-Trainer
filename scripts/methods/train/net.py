@@ -1,11 +1,11 @@
-from train import Trainer
+from methods.train import Trainer
 from torch.nn import functional as F
 
 
 class Net(Trainer):
     def __init__(self, gpu, cfg):
         super().__init__(gpu, cfg)
-        self.generator = self._init_model(cfg.models.generator)
+        self.generator = self._init_model(cfg.models.generator, cfg)
         if cfg.train.ddp.distributed:
             self.generator = self._init_distributed_data_parallel(
                 cfg, self.generator
@@ -26,7 +26,7 @@ class Net(Trainer):
             self._train(i)
 
             if i % self.save_model_every == 0 and self.gpu == 0:
-                average = self._test(self.generator)
+                average = self._valid(self.generator)
                 self._print(average)
                 self._save_model("g", i, self.generator, self.g_optim, average)
 
@@ -56,4 +56,4 @@ class Net(Trainer):
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
             lr = F.interpolate(lr, scale_factor=self.scale, mode="nearest")
-            self._visualize(hr, lr, preds)
+            self._visualize(iter, [hr, lr, preds])

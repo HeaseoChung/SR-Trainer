@@ -1,6 +1,6 @@
 import torch.nn as nn
 import pywt
-import train.loss.pytorch_wavelets.dwt.lowlevel as lowlevel
+import methods.train.loss.pytorch_wavelets.dwt.lowlevel as lowlevel
 import torch
 import torch.nn.functional as F
 

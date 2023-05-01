@@ -2,16 +2,19 @@ from __future__ import absolute_import
 import torch
 import torch.nn.functional as F
 
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import fwd_j1, inv_j1
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+    fwd_j1,
+    inv_j1,
+)
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
     fwd_j1_rot,
     inv_j1_rot,
 )
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
     fwd_j2plus,
     inv_j2plus,
 )
-from train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
+from methods.train.loss.pytorch_wavelets.dtcwt.transform_funcs import (
     fwd_j2plus_rot,
     inv_j2plus_rot,
 )

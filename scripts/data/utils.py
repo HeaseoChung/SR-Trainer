@@ -1,5 +1,16 @@
 import torch
+import os
 import numpy as np
+
+
+def load_image_file(root_dir: str):
+    path = []
+    for root, _, files in os.walk(root_dir):
+        if len(files) > 0:
+            for file_name in files:
+                if check_image_file(file_name):
+                    path.append(os.path.join(root, file_name))
+    return path
 
 
 def check_image_file(filename: str):
@@ -67,3 +78,19 @@ def postprocess(tensor):
     x = np.array(x).transpose([1, 2, 0])
     x = np.clip(x, 0.0, 255.0).astype(np.uint8)
     return x
+
+
+def modcrop(img_in, scale):
+    # img_in: Numpy, HWC or HW
+    img = np.copy(img_in)
+    if img.ndim == 2:
+        H, W = img.shape
+        H_r, W_r = H % scale, W % scale
+        img = img[: H - H_r, : W - W_r]
+    elif img.ndim == 3:
+        H, W, C = img.shape
+        H_r, W_r = H % scale, W % scale
+        img = img[: H - H_r, : W - W_r, :]
+    else:
+        raise ValueError("Wrong img ndim: [{:d}].".format(img.ndim))
+    return img

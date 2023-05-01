@@ -10,6 +10,7 @@ from archs.Utils.utils import *
 class Profiler(Base):
     def __init__(self, cfg, gpu):
         self.scale = cfg.models.generator.scale
+        self.size = [cfg.data.channel, cfg.data.height, cfg.data.width]
         self.gpu = gpu
         self.model_name = cfg.models.generator.name
         self.generator = self._init_model(cfg.models.generator)
@@ -42,10 +43,14 @@ class Profiler(Base):
         end = torch.cuda.Event(enable_timing=True)
 
         self.generator.eval()
-        inputs = torch.randn(1, 3, 256, 256).to(self.gpu)
-        input_dim = (3, 256, 256)
+        inputs = torch.randn(1, self.size[0], self.size[1], self.size[2]).to(
+            self.gpu
+        )
+        input_dim = (self.size[0], self.size[1], self.size[2])
 
-        self.generator(inputs)
+        # GPU Warming up
+        for _ in range(10):
+            self.generator(inputs)
 
         with torch.no_grad():
             start.record()

@@ -11,7 +11,7 @@
 - [Citation](#citation)
 
 ## Updates
-- **_News (2023-02-13)_**: Refactored codes
+- **_News (2023-05-01)_**: Refactored codes
 - **_News (2023-02-13)_**: Implemented profiler to check spec of models
 - **_News (2023-01-10)_**: Implemented Wandb to monitor status of training
 - **_News (2023-01-01)_**: Implemented Knowledge Distillation

@@ -1,4 +1,4 @@
 common:
-  type: "video"
+  method: "video"
   image_path: ""
   save_path: "results"

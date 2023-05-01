@@ -1,4 +1,4 @@
 common:
-  type: "image"
-  image_path: ""
+  method: "image"
+  image_path: "/workspace/LGU_Error/psnr_ssim_check/images/1박 2일 시즌4_상세화면AI.jpg"
   save_path: "results"

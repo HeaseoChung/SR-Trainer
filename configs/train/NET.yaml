@@ -4,7 +4,7 @@ common:
   save_img_every: 1000
   save_model_every: 10000
   seed: 123
-  use_wandb: true
+  use_wandb: false
   ckpt_dir: "psnr_cpkt"
   save_img_dir: "images"
   method: NET
@@ -38,24 +38,24 @@ metrics:
 dataset:
   common:
     sf: -1
-  test:
+  valid:
     type: ImagePairDataset
-    hr_dir: /dataset/SR/DIV2KRK/gt
-    lr_dir: /dataset/SR/DIV2KRK/lr_x2
+    hr_dir: /dataset/NEW_SR/HR/valid/DIV2K/
+    lr_dir: /dataset/NEW_SR/LR/valid/DIV2K/DIV2K_valid_LR_bicubic/X2/
     patch_size : -1
     batch_size: 1
     num_workers: 2
 
   train:
-    type: ImagePairDegradationDataset
-    hr_dir: /dataset/SR/train
+    type: ImageDegradationDataset
+    hr_dir: /dataset/NEW_SR/HR/train/
     lr_dir: ""
     gt_size: 320
     patch_size : 256
     batch_size: 16
     num_workers: 8
 
-    ImagePairDegradationDataset: 
+    ImageDegradationDataset: 
       sharpen:
         use: false
         weight: 1.0

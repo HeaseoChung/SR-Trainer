@@ -1,7 +1,7 @@
 generator:
   name: SCUNet
-  path: ""
-  state_dict: ["g", "g_optim", "iteration"]
+  path: "/workspace/Model_ZOO/SCUNET_TEACHER.pth"
+  n_colors: 3
   scale: 2
   in_nc: 3
   config: [4, 4, 4, 4, 4, 4, 4]
@@ -15,7 +15,6 @@ generator:
 discriminator:
   name: UNet_Discriminator
   path: ""
-  state_dict: ["d", "d_optim", "iteration"]
   num_in_ch: 3
   num_feat: 64
   skip_connection: true
@@ -23,7 +22,7 @@ discriminator:
 teacher:
   name: SCUNet
   path: ""
-  state_dict: ["g", "g_optim", "iteration"]
+  n_colors: 3
   scale: 2
   in_nc: 3
   config: [4, 4, 4, 4, 4, 4, 4]
@@ -37,7 +36,7 @@ teacher:
 student:
   name: SCUNet
   path: ""
-  state_dict: ["g", "g_optim", "iteration"]
+  n_colors: 3
   scale: 2
   in_nc: 3
   config: [1, 1, 1, 1, 1, 1, 1]

@@ -1,7 +1,7 @@
 generator:
   name: EDSR
   path: ""
-  state_dict: ["g", "g_optim", "iteration"]
+  n_colors: 3
   scale: 2
   num_in_ch: 3
   num_out_ch: 3

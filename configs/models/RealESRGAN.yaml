@@ -1,7 +1,7 @@
 generator:
   name: RealESRGAN
   path: ""
-  state_dict: ["g", "g_optim", "iteration"]
+  n_colors: 3
   scale: 4
   num_in_ch: 3
   num_out_ch: 3
@@ -12,7 +12,6 @@ generator:
 discriminator:
   name: UNet_Discriminator
   path: ""
-  state_dict: ["d", "d_optim", "iteration"]
   num_in_ch: 3
   num_feat: 64
   skip_connection: true

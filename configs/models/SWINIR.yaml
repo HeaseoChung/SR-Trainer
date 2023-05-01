@@ -1,7 +1,7 @@
 generator:
   name: SwinIR
   path: ""
-  state_dict: ["g", "g_optim", "iteration"]
+  n_colors: 3
   img_size: 64
   patch_size: 1
   in_chans: 3

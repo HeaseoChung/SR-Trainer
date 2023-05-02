@@ -1,10 +1,10 @@
 generator:
   name: SCUNet
-  path: "/workspace/Model_ZOO/SCUNET_TEACHER.pth"
+  path: ""
   n_colors: 3
   scale: 2
   in_nc: 3
-  config: [4, 4, 4, 4, 4, 4, 4]
+  config: [1, 1, 1, 1, 1, 1, 1]
   dim: 64
   head_dim: 32
   window_size: 8

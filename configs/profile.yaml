@@ -8,5 +8,5 @@ defaults:
 
 data:
   channel: 3
-  width: 256
-  height: 256
+  width: 1920
+  height: 1080

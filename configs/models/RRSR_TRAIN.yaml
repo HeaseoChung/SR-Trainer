@@ -1,0 +1,10 @@
+generator:
+  name: RRSR_TRAIN
+  path: ""
+  n_colors: 3
+  scale: 2
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 30
+  mid_feat: 30
+  num_block: 4

@@ -2,3 +2,4 @@ __pycache__/
 outputs
 *.out
 model_zoo
+scripts/archs/RRSR

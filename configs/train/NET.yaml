@@ -40,14 +40,14 @@ dataset:
     sf: -1
   valid:
     type: ImagePairDataset
-    hr_dir: /dataset/NEW_SR/HR/valid/DIV2K/
-    lr_dir: /dataset/NEW_SR/LR/valid/DIV2K/DIV2K_valid_LR_bicubic/X2/
+    hr_dir: /dataset/NEW_SR/HR/valid
+    lr_dir: /dataset/NEW_SR/LR/valid
     patch_size : -1
     batch_size: 1
     num_workers: 2
 
   train:
-    type: ImageDegradationDataset
+    type: ImageDataset
     hr_dir: /dataset/NEW_SR/HR/train/
     lr_dir: ""
     gt_size: 320

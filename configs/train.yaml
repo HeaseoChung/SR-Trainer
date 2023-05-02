@@ -1,8 +1,8 @@
 hydra:
   run:
-    dir: ./outputs/SCUNET/train/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./outputs/RRSR_TRAIN/train/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
 defaults:
   - _self_
   - train: NET
-  - models: SCUNET
+  - models: RRSR_TRAIN

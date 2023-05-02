@@ -1,0 +1,9 @@
+generator:
+  name: ECBSR
+  path: ""
+  n_colors: 3
+  scale: 2
+  num_feat: 16
+  num_block: 4
+  with_idt: 0
+  act_type: "prelu"

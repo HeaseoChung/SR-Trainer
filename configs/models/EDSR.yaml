@@ -5,6 +5,6 @@ generator:
   scale: 2
   num_in_ch: 3
   num_out_ch: 3
-  num_feat: 64
-  num_block: 16
+  num_feat: 32
+  num_block: 4
   res_scale: 1.0 #16x64 for 1.0, 32x256 for 0.1

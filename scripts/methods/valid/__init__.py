@@ -3,12 +3,12 @@ import torch
 import torchvision.utils as vutils
 import pandas as pd
 
-from torch import nn
 from torch.nn import functional as F
 from torch.utils.data.dataloader import DataLoader
 from data import define_dataset
+from data.utils import postprocess
 from archs import define_model
-from metric import define_metrics
+from methods.metric import define_metrics
 from methods import Base
 
 
@@ -21,44 +21,31 @@ class Valider(Base):
         self.scale = cfg.models.generator.scale
 
         ### Common setting
+        self.save_csv = cfg.valid.common.save_csv
         self.save_path = cfg.valid.common.ckpt_dir
         os.makedirs(self.save_path, exist_ok=True)
         self.seed = cfg.valid.common.seed
 
         ### Model setting
-        self.generator = None
-        self.discriminator = None
+        self.generator = self._init_model(cfg.models.generator)
+        self.generator = self._load_state_dict(
+            cfg.models.generator.path, self.generator
+        )
 
-        self.valid_dataloader = None
-
-        ### Metrics setting
-        self.metrics = None
-
-        self._init_model(cfg)
         self._init_dataset(cfg)
         self._init_metrics(cfg)
         self._run()
 
     def _init_model(self, cfg):
-        return define_model(cfg, self.gpu)
+        return define_model(cfg, self.gpu).eval()
 
     def _load_state_dict(self, path, model):
         if path:
-            ckpt = torch.load(
-                path,
-                map_location=lambda storage, loc: storage,
-            )
+            ckpt = torch.load(path, map_location=lambda storage, loc: storage)
             if len(ckpt) == 3:
-                if isinstance(model, nn.DataParallel):
-                    model.module.load_state_dict(ckpt["model"])
-                else:
-                    model.load_state_dict(ckpt["model"])
-                self.start_iters = ckpt["iteration"] + 1
+                model.load_state_dict(ckpt["model"])
             else:
                 model.load_state_dict(ckpt)
-        else:
-            self.start_iters = 0
-            print("State dictionary: Checkpoint is not going to be used")
         return model
 
     def _init_dataset(self, cfg):
@@ -93,12 +80,16 @@ class Valider(Base):
             results, os.path.join(self.save_path, f"compare_{i}.png")
         )
 
+    def _save_csv(self, scores):
+        df = pd.DataFrame.from_dict(scores, orient="columns")
+        df.to_csv(os.path.join(self.save_path, "Quantitative_Score.csv"))
+
     def _run(self):
         self.generator.eval()
         scores = {}
 
-        for m in self.metrics:
-            scores[m.name] = []
+        for k in self.metrics.keys():
+            scores[k] = []
 
         for i, (lr, hr) in enumerate(self.dataloader):
             lr = lr.to(self.gpu)
@@ -107,11 +98,20 @@ class Valider(Base):
             with torch.no_grad():
                 preds = self.generator(lr)
 
-            for m in self.metrics:
-                scores[m.name].append(m(preds, hr).item())
+            preds = postprocess(preds)
+            hr = postprocess(hr)
+
+            for k in self.metrics.keys():
+                score = self.metrics[k](preds, hr, self.scale)
+                print(f"score[{k}]: {score}")
+                scores[k].append(score)
 
             lr = F.interpolate(lr, scale_factor=self.scale, mode="nearest")
-            self._visualize(i, hr, lr, preds)
 
-        df = pd.DataFrame.from_dict(scores, orient="columns")
-        df.to_csv("Quantitative_Score.csv")
+        for k in self.metrics.keys():
+            avg_score = sum(scores[k]) / len(scores[k])
+            scores["avg_" + k] = avg_score
+            print(f"avg_{k}: {avg_score}")
+
+        if self.save_csv:
+            self._save_csv(scores)

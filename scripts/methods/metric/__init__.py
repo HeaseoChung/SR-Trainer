@@ -6,6 +6,8 @@ def define_metrics(cfg):
     for m in cfg.metrics.types:
         if m == "psnr":
             metrics[m] = calculate_psnr
+        elif m == "psnr_Y":
+            metrics[m] = calculate_psnr_Y
         elif m == "ssim":
             metrics[m] = calculate_ssim
 

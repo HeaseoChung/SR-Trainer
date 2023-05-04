@@ -8,7 +8,7 @@ from methods.valid import Valider
 def main(cfg):
     torch.backends.cudnn.benchmark = True
     torch.backends.cudnn.deterministic = True
-    Valider(cfg, 0)
+    Valider(0, cfg)
 
 
 if __name__ == "__main__":

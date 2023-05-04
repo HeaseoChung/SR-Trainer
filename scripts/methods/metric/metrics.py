@@ -3,6 +3,22 @@ import math
 import cv2
 
 
+def calculate_psnr_Y(img1, img2, scale=2, rgb_range=255.0):
+    diff = (1.0 * img1 - 1.0 * img2) / rgb_range
+
+    shave = scale
+
+    diff[:, :, 0] = diff[:, :, 0] * 65.738 / 256
+    diff[:, :, 1] = diff[:, :, 1] * 129.057 / 256
+    diff[:, :, 2] = diff[:, :, 2] * 25.064 / 256
+
+    diff = np.sum(diff, axis=2)
+
+    valid = diff[shave:-shave, shave:-shave]
+    mse = np.mean(valid**2)
+    return -10 * math.log10(mse)
+
+
 def calculate_psnr(img1, img2, border=0, max_pixel=255.0):
     # img1 and img2 have range [0, 255]
     if not img1.shape == img2.shape:

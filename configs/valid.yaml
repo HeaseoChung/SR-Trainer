@@ -4,5 +4,6 @@ hydra:
 
 defaults:
   - _self_
-  - valid: quantitative
   - models: SCUNET
+  - valid: quantitative
+  

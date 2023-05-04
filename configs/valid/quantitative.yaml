@@ -1,4 +1,5 @@
 common:
+  save_csv: False
   ckpt_dir: "quantitative"
   seed: 123
   
@@ -8,11 +9,11 @@ dataset:
 
   valid:
     type: ImagePairDataset
-    hr_dir: /dataset/SR/DIV2KRK/gt/
-    lr_dir: /dataset/SR/DIV2KRK/lr_x2/
+    hr_dir: /dataset/NTIRE2023/HR/valid/DIV2K/
+    lr_dir:  /dataset/NTIRE2023/LR/x2/DIV2K/DIV2K_valid_LR_bicubic/X2/
     patch_size : -1
     batch_size: 1
     num_workers: 4
 
 metrics: 
-  types: [psnr, ssim, niqe]
+  types: [psnr_Y]

@@ -243,6 +243,20 @@ class Degradation:
                     if random.random() < 0.9:
                         lr = self.add_JPEG_noise(lr)
 
+
+        lr = cv2.resize(
+            lr,
+            (
+                self.gt_size // self.sf,
+                self.gt_size // self.sf,
+            ),
+            interpolation=random.choice([1, 2, 3]),
+        )
+
+        hr, lr = random_crop(
+            hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
+        )
+        
         # if random.random() < 0.1:
         #     lr = self.add_interlace(lr)
 

@@ -31,6 +31,14 @@ def define_model(configs, gpu):
         from archs.ECBSR.models import Generator
 
         model = Generator(configs).to(gpu)
+    elif model_name == "srcnn":
+        from archs.SRCNN.models import Generator
+
+        model = Generator(configs).to(gpu)
+    elif model_name == "fsrcnn":
+        from archs.FSRCNN.models import Generator
+
+        model = Generator(configs).to(gpu)
     elif model_name == "rlfn":
         from archs.RLFN.models import Generator
 

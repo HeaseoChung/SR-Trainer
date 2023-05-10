@@ -8,6 +8,7 @@ import numpy as np
 from methods.train.net import Net
 from methods.train.gan import GAN
 from methods.train.kd import KD
+from methods.train.ws import WS
 
 
 @hydra.main(config_path="../configs/", config_name="train.yaml")
@@ -24,6 +25,8 @@ def main(cfg):
         trainer = GAN
     elif cfg.train.common.method == "KD":
         trainer = KD
+    elif cfg.train.common.method == "WS":
+        trainer = WS
 
     if torch.cuda.device_count() > 1:
         print("Train with multiple GPUs")

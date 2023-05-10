@@ -57,7 +57,7 @@ def main(cfg):
     rep_state_dict = model.state_dict()
     pretrain_state_dict = torch.load(
         cfg.models.generator.path, map_location="cuda"
-    )
+    )["model"]
 
     for k, v in tqdm(rep_state_dict.items()):
         # merge conv1x1-conv3x3-conv1x1

@@ -10,7 +10,7 @@ from archs.Utils.utils import *
 class Profiler(Base):
     def __init__(self, cfg, gpu):
         self.scale = cfg.models.generator.scale
-        self.size = [cfg.data.channel, cfg.data.height, cfg.data.width]
+        self.size = [cfg.data.batch, cfg.data.channel, cfg.data.height, cfg.data.width]
         self.gpu = gpu
         self.model_name = cfg.models.generator.name
         self.generator = self._init_model(cfg.models.generator)
@@ -30,11 +30,9 @@ class Profiler(Base):
                     model.module.load_state_dict(ckpt["model"])
                 else:
                     model.load_state_dict(ckpt["model"])
-                self.start_iters = ckpt["iteration"] + 1
             else:
                 model.load_state_dict(ckpt)
         else:
-            self.start_iters = 0
             print("State dictionary: Checkpoint is not going to be used")
         return model
 

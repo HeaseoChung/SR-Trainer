@@ -1,6 +1,6 @@
 generator:
   name: RRSR_TRAIN
-  path: ""
+  path: "/workspace/SR/SR-Trainer/scripts/outputs/RRSR_TRAIN/train/2023-05-03/08-59-52/psnr_cpkt/best_psnr.pth"
   n_colors: 3
   scale: 2
   num_in_ch: 3

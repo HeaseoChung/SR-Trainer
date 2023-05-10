@@ -4,5 +4,5 @@ hydra:
 
 defaults:
   - _self_
-  - train: NET
+  - train: WS
   - models: RRSR_TRAIN

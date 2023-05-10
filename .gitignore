@@ -1,5 +1,7 @@
 __pycache__/
 outputs
 *.out
+*.trt
 model_zoo
 scripts/archs/RRSR
+testsets

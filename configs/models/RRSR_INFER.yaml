@@ -1,6 +1,6 @@
 generator:
   name: RRSR_INFER
-  path: ""
+  path: "/workspace/SR/SR-Trainer/scripts/RRSR_INFER_x2_fp16_1_3_1080_1920.trt"
   n_colors: 3
   scale: 2
   num_in_ch: 3

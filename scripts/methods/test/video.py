@@ -16,6 +16,10 @@ class Video(Tester):
     def __init__(self, cfg, gpu):
         super().__init__(cfg, gpu)
         self.n_color = cfg.models.generator.n_colors
+        self.generator = self._init_model(cfg.models.generator)
+        self.generator = self._load_state_dict(
+            cfg.models.generator.path, self.generator
+        )
         self.img_test()
 
     def video_test(self):

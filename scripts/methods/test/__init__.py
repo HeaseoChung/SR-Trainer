@@ -13,11 +13,6 @@ class Tester(Base):
         self.save_path = cfg.test.common.save_path
         os.makedirs(self.save_path, exist_ok=True)
 
-        self.generator = self._init_model(cfg.models.generator)
-        self.generator = self._load_state_dict(
-            cfg.models.generator.path, self.generator
-        )
-
     def _init_model(self, cfg):
         return define_model(cfg, self.gpu).eval()
 

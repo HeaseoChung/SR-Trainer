@@ -14,6 +14,10 @@ class Image(Tester):
     def __init__(self, cfg, gpu):
         super().__init__(cfg, gpu)
         self.n_color = cfg.models.generator.n_colors
+        self.generator = self._init_model(cfg.models.generator)
+        self.generator = self._load_state_dict(
+            cfg.models.generator.path, self.generator
+        )
         self.img_test()
 
     def img_test(self):
@@ -27,10 +31,6 @@ class Image(Tester):
             images.append(self.image_path)
         else:
             raise ValueError("Neither a file or directory")
-
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        time_elasped = []
 
         for path in tqdm(images):
             img = cv2.imread(path)

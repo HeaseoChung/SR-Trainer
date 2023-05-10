@@ -1,0 +1,8 @@
+generator:
+  name: FSRCNN
+  path: ""
+  scale: 2
+  n_colors: 3
+  num_feat: 56
+  num_sfeat: 12
+  num_blocks: 4

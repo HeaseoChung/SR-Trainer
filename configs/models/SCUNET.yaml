@@ -1,6 +1,6 @@
 generator:
   name: SCUNet
-  path: ""
+  path: "/workspace/sr-trainer/model_zoo/SCUNET_STUDENT.pth"
   n_colors: 3
   scale: 2
   in_nc: 3

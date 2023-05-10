@@ -1,0 +1,6 @@
+generator:
+  name: SRCNN
+  path: ""
+  scale: 2
+  n_colors: 3
+  num_feat: 64

@@ -39,7 +39,7 @@ class Trainer(Base):
         self.use_wandb = cfg.train.common.use_wandb
         self.train_method = cfg.train.common.method
         if self.use_wandb:
-            wandb.init(project=f"NET_{cfg.models.generator.name}")
+            wandb.init(project=f"{cfg.models.generator.name}")
             wandb.config.update(cfg)
 
         self.save_log_every = cfg.train.common.save_log_every

@@ -9,8 +9,8 @@ dataset:
 
   valid:
     type: ImagePairDataset
-    hr_dir: /dataset/NTIRE2023/HR/valid/DIV2K/
-    lr_dir:  /dataset/NTIRE2023/LR/x2/DIV2K/DIV2K_valid_LR_bicubic/X2/
+    hr_dir: /workspace/SR/SR-Trainer/testsets/Set5/HR
+    lr_dir: /workspace/SR/SR-Trainer/testsets/Set5/LR
     patch_size : -1
     batch_size: 1
     num_workers: 4

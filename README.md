@@ -11,6 +11,7 @@
 - [Citation](#citation)
 
 ## Updates
+- **_News (2023-05-12)_**: Implemented conversion for ONNX and TensorRT inference
 - **_News (2023-05-01)_**: Refactored codes
 - **_News (2023-02-13)_**: Implemented profiler to check spec of models
 - **_News (2023-01-10)_**: Implemented Wandb to monitor status of training

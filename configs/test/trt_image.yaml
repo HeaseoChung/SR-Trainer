@@ -1,6 +1,6 @@
 common:
   method: "trt_image"
-  image_path: "/workspace/sr-trainer/examples/LGU/20230222/LGU_Error/onehundred/01_1_AI_꽃길만걸어요.jpg"
+  image_path: "/workspace/Videos/random_samples/taekwon"
   save_path: "results"
 
 data:

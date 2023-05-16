@@ -1,5 +1,6 @@
-import torch
 import os
+import cv2
+import torch
 import numpy as np
 
 
@@ -94,3 +95,16 @@ def modcrop(img_in, scale):
     else:
         raise ValueError("Wrong img ndim: [{:d}].".format(img.ndim))
     return img
+
+
+def sharpen(img):
+    kernel_sharpening_9 = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
+    kernel_sharpening_3 = np.array(
+        [[0, -0.5, 0], [-0.5, 3, -0.5], [0, -0.5, 0]]
+    )
+    kernel_sharpening_3_25 = np.array(
+        [[-0.25, -0.25, -0.25], [-0.25, 3, -0.25], [-0.25, -0.25, -0.25]]
+    )
+    kernel_sharpening_1 = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
+    sharpened = cv2.filter2D(img, -1, kernel_sharpening_3)
+    return sharpened

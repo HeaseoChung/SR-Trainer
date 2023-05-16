@@ -1,3 +1,5 @@
+from queue import Queue
+import threading
 import os
 import time
 import cv2
@@ -9,11 +11,21 @@ import cv2
 import os
 from methods.test import Tester
 from tqdm import tqdm
-from data.utils import (
-    check_image_file,
-    preprocess,
-    postprocess,
-)
+from data.utils import check_image_file, sharpen
+
+
+def save_video(q):
+    while True:
+        if q:
+            name, img, c, tc = q.get()
+            print(name, c, tc)
+            cv2.imwrite(
+                name,
+                img,
+            )
+
+            if c == tc:
+                break
 
 
 class TRT_Image(Tester):
@@ -38,9 +50,14 @@ class TRT_Image(Tester):
                 trt.Logger(trt.Logger.ERROR)
             ).deserialize_cuda_engine(f.read())
         self.context = self.engine.create_execution_context()
-        self.img_test()
 
-    def img_test(self):
+        queue = Queue()
+        thread1 = threading.Thread(target=save_video, args=(queue,))
+        thread1.start()
+        self.img_test(queue)
+        thread1.join()
+
+    def img_test(self, q):
         h_input = cuda.pagelocked_empty(
             trt.volume(self.input_size), dtype=np.float32
         )
@@ -60,8 +77,25 @@ class TRT_Image(Tester):
         else:
             raise ValueError("Neither a file or directory")
 
-        for path in tqdm(images):
+        total_frame = len(images) - 1
+
+        for i, path in enumerate(tqdm(images)):
             img = cv2.imread(path)
+            h, w = img.shape[:2]
+            bic = cv2.resize(
+                img,
+                (w * self.scale, h * self.scale),
+                interpolation=cv2.INTER_CUBIC,
+            )
+
+            q.put(
+                (
+                    os.path.join(self.save_path, "bic_" + path.split("/")[-1]),
+                    bic,
+                    i,
+                    total_frame,
+                )
+            )
 
             if self.n_color == 1:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -72,14 +106,14 @@ class TRT_Image(Tester):
             lr = lr.transpose([2, 0, 1])
             lr /= 255.0
 
-            start = time.time()
             cuda.memcpy_htod(d_input, lr.ravel())
+            # start = time.time()
             self.context.execute(
                 batch_size=self.input_size[0],
                 bindings=[int(d_input), int(d_output)],
             )
+            # print(f"time : {time.time() - start}")
             cuda.memcpy_dtoh(h_output, d_output)
-            print(f"time : {time.time() - start}")
 
             preds = h_output.reshape(self.output_size)
 
@@ -88,7 +122,15 @@ class TRT_Image(Tester):
                 p = p.transpose([1, 2, 0])
                 p = np.clip(p, 0.0, 255.0).astype(np.uint8)
                 p = cv2.cvtColor(p, cv2.COLOR_BGR2RGB)
-                cv2.imwrite(
-                    os.path.join(self.save_path, path.split("/")[-1]),
-                    p,
+                p = sharpen(p)
+
+                q.put(
+                    (
+                        os.path.join(
+                            self.save_path, "SR_" + path.split("/")[-1]
+                        ),
+                        p,
+                        i,
+                        total_frame,
+                    )
                 )

@@ -1,6 +1,6 @@
 generator:
   name: RRSR_INFER
-  path: "/workspace/Model_ZOO/RRSR_INFER_x2_fp16_1_3_1080_1920.trt"
+  path: "/workspace/Model_ZOO/reparam_RRSR_INFER.pth"
   n_colors: 3
   scale: 2
   num_in_ch: 3

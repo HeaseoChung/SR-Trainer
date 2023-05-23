@@ -1,0 +1,13 @@
+hydra:
+  run:
+    dir: ./outputs/RRSR_INFER/prune/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+defaults:
+  - _self_
+  - models: RRSR_INFER
+
+data:
+  batch: 1
+  channel: 3
+  width: 1920
+  height: 1080

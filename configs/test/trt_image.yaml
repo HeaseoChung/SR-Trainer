@@ -1,6 +1,6 @@
 common:
   method: "trt_image"
-  image_path: "/workspace/Videos/random_samples/taekwon"
+  image_path: "/workspace/LGU_Error/psnr_ssim_check/images/이산_상세화면AI.jpg"
   save_path: "results"
 
 data:

@@ -1,5 +1,6 @@
 import os
 import torch
+import torch_pruning as tp
 
 from torch import nn
 from archs import define_model
@@ -7,10 +8,9 @@ from methods import Base
 from archs.Utils.utils import *
 
 
-class ONNX(Base):
+class Pruner(Base):
     def __init__(self, cfg, gpu):
         self.scale = cfg.models.generator.scale
-        self.dynamic_shape = cfg.data.dynamic_shape
         self.size = [
             cfg.data.batch,
             cfg.data.channel,
@@ -47,28 +47,46 @@ class ONNX(Base):
 
     def _run(self):
         self.generator.eval()
-        inputs = torch.randn(
-            self.size[0], self.size[1], self.size[2], self.size[3]
-        ).to(self.gpu)
+        print("Before pruning:")
+        print(self.generator)
+
+        inputs = torch.randn(1, 3, 1080, 1920).cuda()
+
+        DG = tp.DependencyGraph().build_dependency(
+            self.generator, example_inputs=inputs
+        )
+
+        pruning_idxs = pruning_idxs = [2]
+        pruning_group = DG.get_pruning_group(
+            self.generator.conv_1, tp.prune_conv_out_channels, idxs=pruning_idxs
+        )
+        if DG.check_pruning_group(pruning_group):
+            pruning_group.prune()
+
+        print("After pruning:")
+        print(self.generator)
+
+        all_groups = list(DG.get_all_groups())
+        print("Number of Groups: %d" % len(all_groups))
+        print("The last Group:", all_groups[-1])
+
+        # self.generator.zero_grad()  # We don't want to store gradient information
 
         out = self.generator(inputs)
-
-        if self.dynamic_shape:
-            dynamic_axes = {
-                "input": {2: "height", 3: "width"},
-                "output": {2: "height", 3: "width"},
-            }
-        else:
-            dynamic_axes = {}
 
         torch.onnx.export(
             self.generator,
             inputs,
-            f"{self.model_name}_x{self.scale}_{self.size[0]}_{self.size[1]}_{self.size[2]}_{self.size[3]}.onnx",
+            f"pruned_model.onnx",
             export_params=True,
-            opset_version=12,
+            opset_version=11,
             do_constant_folding=True,
             input_names=["input"],
             output_names=["output"],
-            dynamic_axes=dynamic_axes,
         )
+
+        # torch.save(
+        #     self.generator.state_dict(),
+        #     "pruned_model.pth",
+        # )  # without .state_dict
+        # self.generator = torch.load('model.pth') # load the model object

@@ -77,8 +77,7 @@ class TRT_Image(Tester):
         else:
             raise ValueError("Neither a file or directory")
 
-        total_frame = len(images) - 1
-
+        total_frame = len(images)
         for i, path in enumerate(tqdm(images)):
             img = cv2.imread(path)
             h, w = img.shape[:2]
@@ -92,7 +91,7 @@ class TRT_Image(Tester):
                 (
                     os.path.join(self.save_path, "bic_" + path.split("/")[-1]),
                     bic,
-                    i,
+                    0,
                     total_frame,
                 )
             )
@@ -107,30 +106,28 @@ class TRT_Image(Tester):
             lr /= 255.0
 
             cuda.memcpy_htod(d_input, lr.ravel())
-            # start = time.time()
+            start = time.time()
             self.context.execute(
                 batch_size=self.input_size[0],
                 bindings=[int(d_input), int(d_output)],
             )
-            # print(f"time : {time.time() - start}")
+            print(f"time : {time.time() - start}")
             cuda.memcpy_dtoh(h_output, d_output)
 
             preds = h_output.reshape(self.output_size)
-
+            print(f"preds.shape: {preds.shape}")
             for p in preds:
                 p *= 255.0
                 p = p.transpose([1, 2, 0])
                 p = np.clip(p, 0.0, 255.0).astype(np.uint8)
                 p = cv2.cvtColor(p, cv2.COLOR_BGR2RGB)
-                p = sharpen(p)
-
                 q.put(
                     (
                         os.path.join(
                             self.save_path, "SR_" + path.split("/")[-1]
                         ),
                         p,
-                        i,
+                        i + 1,
                         total_frame,
                     )
                 )

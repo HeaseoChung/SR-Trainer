@@ -10,7 +10,12 @@ from archs.Utils.utils import *
 class Profiler(Base):
     def __init__(self, cfg, gpu):
         self.scale = cfg.models.generator.scale
-        self.size = [cfg.data.batch, cfg.data.channel, cfg.data.height, cfg.data.width]
+        self.size = [
+            cfg.data.batch,
+            cfg.data.channel,
+            cfg.data.height,
+            cfg.data.width,
+        ]
         self.gpu = gpu
         self.model_name = cfg.models.generator.name
         self.generator = self._init_model(cfg.models.generator)
@@ -41,9 +46,7 @@ class Profiler(Base):
         end = torch.cuda.Event(enable_timing=True)
 
         self.generator.eval()
-        inputs = torch.randn(self.size[0], self.size[1], self.size[2], self.size[3]).to(
-            self.gpu
-        )
+        inputs = torch.randn(1, self.size[1], self.size[2], self.size[3]).to(self.gpu)
         input_dim = (self.size[1], self.size[2], self.size[3])
 
         # GPU Warming up
@@ -57,24 +60,28 @@ class Profiler(Base):
             end.record()
             torch.cuda.synchronize()
 
-        print(
-            "------> Average runtime of {} is : {:.6f} ms".format(
-                self.model_name, start.elapsed_time(end)
+            print(self.generator)
+
+            print(
+                "------> Average runtime of {} is : {:.6f} ms".format(
+                    self.model_name, start.elapsed_time(end)
+                )
             )
-        )
 
-        flops = get_model_flops(self.generator, input_dim, False)
-        flops = flops / 10**9
-        print("{:>16s} : {:<.4f} [G]".format("FLOPs", flops))
+            flops = get_model_flops(self.generator, input_dim, False)
+            flops = flops / 10**9
+            print("{:>16s} : {:<.4f} [G]".format("FLOPs", flops))
 
-        activations, num_conv = get_model_activation(self.generator, input_dim)
-        activations = activations / 10**6
-        print("{:>16s} : {:<.4f} [M]".format("#Activations", activations))
-        print("{:>16s} : {:<d}".format("#Conv2d", num_conv))
+            activations, num_conv = get_model_activation(self.generator, input_dim)
+            activations = activations / 10**6
+            print("{:>16s} : {:<.4f} [M]".format("#Activations", activations))
+            print("{:>16s} : {:<d}".format("#Conv2d", num_conv))
 
-        num_parameters = sum(map(lambda x: x.numel(), self.generator.parameters()))
-        num_parameters = num_parameters / 10**6
-        print("{:>16s} : {:<.4f} [M]".format("#Params", num_parameters))
+            num_parameters = sum(map(lambda x: x.numel(), self.generator.parameters()))
+            num_parameters = num_parameters / 10**6
+            print("{:>16s} : {:<.4f} [M]".format("#Params", num_parameters))
 
-        max_mem = torch.cuda.max_memory_allocated(torch.cuda.current_device()) / 1024**2
-        print("{:>16s} : {:<.3f} [M]".format("Max Memory", max_mem))
+            max_mem = (
+                torch.cuda.max_memory_allocated(torch.cuda.current_device()) / 1024**2
+            )
+            print("{:>16s} : {:<.3f} [M]".format("Max Memory", max_mem))

@@ -33,9 +33,7 @@ class Degradation:
         self.sharpen = dataset.ImageDegradationDataset.sharpen.use
         self.sharpen_weight = dataset.ImageDegradationDataset.sharpen.weight
         self.sharpen_radius = dataset.ImageDegradationDataset.sharpen.radius
-        self.sharpen_threshold = (
-            dataset.ImageDegradationDataset.sharpen.threshold
-        )
+        self.sharpen_threshold = dataset.ImageDegradationDataset.sharpen.threshold
 
         """ degradation """
         self.deg = dataset.ImageDegradationDataset.deg.use
@@ -45,9 +43,7 @@ class Degradation:
                 dataset.ImageDegradationDataset.deg.processes_plus
             )
         else:
-            self.deg_processes = list(
-                dataset.ImageDegradationDataset.deg.processes
-            )
+            self.deg_processes = list(dataset.ImageDegradationDataset.deg.processes)
         self.num_deg = (
             len(self.deg_processes)
             if len(self.deg_processes) % 2 == 0
@@ -83,33 +79,23 @@ class Degradation:
         self.mode_list = dataset.ImageDegradationDataset.deg.mode_list
 
         # Noise
-        self.noise_level1 = (
-            dataset.ImageDegradationDataset.deg.noise_level1
-        )  # 2
-        self.noise_level2 = (
-            dataset.ImageDegradationDataset.deg.noise_level2
-        )  # 25
+        self.noise_level1 = dataset.ImageDegradationDataset.deg.noise_level1  # 2
+        self.noise_level2 = dataset.ImageDegradationDataset.deg.noise_level2  # 25
 
         # JPEG
         self.jpeg_prob = dataset.ImageDegradationDataset.deg.jpeg_prob
         self.jpeg_range = dataset.ImageDegradationDataset.deg.jpeg_range
 
         # Sinc
-        self.final_sinc_prob = (
-            dataset.ImageDegradationDataset.deg.final_sinc_prob
-        )
+        self.final_sinc_prob = dataset.ImageDegradationDataset.deg.final_sinc_prob
         self.pulse_tensor = torch.zeros(
             21, 21
         ).float()  # convolving with pulse tensor brings no blurry effect
         self.pulse_tensor[10, 10] = 1
 
         # Interlace
-        self.h_shift_strength = (
-            dataset.ImageDegradationDataset.deg.h_shift_strength
-        )
-        self.v_shift_strength = (
-            dataset.ImageDegradationDataset.deg.v_shift_strength
-        )
+        self.h_shift_strength = dataset.ImageDegradationDataset.deg.h_shift_strength
+        self.v_shift_strength = dataset.ImageDegradationDataset.deg.v_shift_strength
 
     def data_pipeline(self, hr):
         hr, _ = random_crop(hr=hr, lr=None, crop_size=self.gt_size, sf=self.sf)
@@ -197,7 +183,7 @@ class Degradation:
                 if deg == "blur_1":
                     lr = self.add_blur(lr, self.sf)
                 elif deg == "blur_2":
-                    lr = self.add_blur(lr, self.sf)
+                    lr = self.add_blur2(lr, self.sf)
                 elif deg == "resize_1":
                     a, b = lr.shape[1], lr.shape[0]
                     if random.random() < 0.75:
@@ -243,7 +229,6 @@ class Degradation:
                     if random.random() < 0.9:
                         lr = self.add_JPEG_noise(lr)
 
-
         lr = cv2.resize(
             lr,
             (
@@ -253,10 +238,8 @@ class Degradation:
             interpolation=random.choice([1, 2, 3]),
         )
 
-        hr, lr = random_crop(
-            hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
-        )
-        
+        hr, lr = random_crop(hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf)
+
         # if random.random() < 0.1:
         #     lr = self.add_interlace(lr)
 
@@ -265,12 +248,8 @@ class Degradation:
         return lr, hr
 
     def add_interlace(self, img):
-        h_strength = random.randrange(
-            -self.h_shift_strength, self.h_shift_strength
-        )
-        v_strength = random.randrange(
-            -self.v_shift_strength, self.v_shift_strength
-        )
+        h_strength = random.randrange(-self.h_shift_strength, self.h_shift_strength)
+        v_strength = random.randrange(-self.v_shift_strength, self.v_shift_strength)
 
         h, w = img.shape[:2]
         even_heights = [h for h in range(0, h, 2)]
@@ -295,6 +274,17 @@ class Degradation:
 
         return img
 
+    def add_blur2(self, img, sf=4):
+        if random.random() < 0.5:
+            wd = 2.0 + 0.2 * sf
+            k = self.fspecial_gaussian(
+                2 * random.randint(2, 11) + 3, wd * random.random()
+            )
+            img = ndimage.filters.convolve(
+                img, np.expand_dims(k, axis=2), mode="mirror"
+            )
+        return img
+
     def add_blur(self, img, sf=4):
         def gm_blur_kernel(mean, cov, size=15):
             center = size / 2.0 + 0.5
@@ -303,9 +293,7 @@ class Degradation:
                 for x in range(size):
                     cy = y - center + 1
                     cx = x - center + 1
-                    k[y, x] = ss.multivariate_normal.pdf(
-                        [cx, cy], mean=mean, cov=cov
-                    )
+                    k[y, x] = ss.multivariate_normal.pdf([cx, cy], mean=mean, cov=cov)
 
             k = k / np.sum(k)
             return k
@@ -338,9 +326,9 @@ class Degradation:
 
             return k
 
-        wd2 = 4.0 + sf
-        wd = 2.0 + 0.2 * sf
         if random.random() < 0.5:
+            wd2 = 4.0 + sf
+
             l1 = wd2 * random.random()
             l2 = wd2 * random.random()
             k = anisotropic_Gaussian(
@@ -349,13 +337,10 @@ class Degradation:
                 l1=l1,
                 l2=l2,
             )
-        else:
-            k = self.fspecial_gaussian(
-                2 * random.randint(2, 11) + 3, wd * random.random()
+
+            img = ndimage.filters.convolve(
+                img, np.expand_dims(k, axis=2), mode="mirror"
             )
-        img = ndimage.filters.convolve(
-            img, np.expand_dims(k, axis=2), mode="mirror"
-        )
 
         return img
 
@@ -416,9 +401,7 @@ class Degradation:
         elif mode == "bicubic":
             flags = cv2.INTER_CUBIC
 
-        image = cv2.resize(
-            image, (int(w * scale), int(h * scale)), interpolation=flags
-        )
+        image = cv2.resize(image, (int(w * scale), int(h * scale)), interpolation=flags)
         return image
 
     def random_resizing2(self, image):
@@ -440,9 +423,7 @@ class Degradation:
         elif mode == "bicubic":
             flags = cv2.INTER_CUBIC
 
-        image = cv2.resize(
-            image, (int(w * scale), int(h * scale)), interpolation=flags
-        )
+        image = cv2.resize(image, (int(w * scale), int(h * scale)), interpolation=flags)
         return image
 
     def random_mixed_kernels(
@@ -561,9 +542,7 @@ class Degradation:
         sigma_x = np.random.uniform(sigma_x_range[0], sigma_x_range[1])
         if isotropic is False:
             assert sigma_y_range[0] < sigma_y_range[1], "Wrong sigma_y_range."
-            assert (
-                rotation_range[0] < rotation_range[1]
-            ), "Wrong rotation_range."
+            assert rotation_range[0] < rotation_range[1], "Wrong rotation_range."
             sigma_y = np.random.uniform(sigma_y_range[0], sigma_y_range[1])
             rotation = np.random.uniform(rotation_range[0], rotation_range[1])
         else:
@@ -577,9 +556,7 @@ class Degradation:
         # add multiplicative noise
         if noise_range is not None:
             assert noise_range[0] < noise_range[1], "Wrong noise range."
-            noise = np.random.uniform(
-                noise_range[0], noise_range[1], size=kernel.shape
-            )
+            noise = np.random.uniform(noise_range[0], noise_range[1], size=kernel.shape)
             kernel = kernel * noise
         kernel = kernel / np.sum(kernel)
         return kernel
@@ -612,9 +589,7 @@ class Degradation:
         sigma_x = np.random.uniform(sigma_x_range[0], sigma_x_range[1])
         if isotropic is False:
             assert sigma_y_range[0] < sigma_y_range[1], "Wrong sigma_y_range."
-            assert (
-                rotation_range[0] < rotation_range[1]
-            ), "Wrong rotation_range."
+            assert rotation_range[0] < rotation_range[1], "Wrong rotation_range."
             sigma_y = np.random.uniform(sigma_y_range[0], sigma_y_range[1])
             rotation = np.random.uniform(rotation_range[0], rotation_range[1])
         else:
@@ -634,9 +609,7 @@ class Degradation:
         # add multiplicative noise
         if noise_range is not None:
             assert noise_range[0] < noise_range[1], "Wrong noise range."
-            noise = np.random.uniform(
-                noise_range[0], noise_range[1], size=kernel.shape
-            )
+            noise = np.random.uniform(noise_range[0], noise_range[1], size=kernel.shape)
             kernel = kernel * noise
         kernel = kernel / np.sum(kernel)
         return kernel
@@ -669,9 +642,7 @@ class Degradation:
         sigma_x = np.random.uniform(sigma_x_range[0], sigma_x_range[1])
         if isotropic is False:
             assert sigma_y_range[0] < sigma_y_range[1], "Wrong sigma_y_range."
-            assert (
-                rotation_range[0] < rotation_range[1]
-            ), "Wrong rotation_range."
+            assert rotation_range[0] < rotation_range[1], "Wrong rotation_range."
             sigma_y = np.random.uniform(sigma_y_range[0], sigma_y_range[1])
             rotation = np.random.uniform(rotation_range[0], rotation_range[1])
         else:
@@ -690,9 +661,7 @@ class Degradation:
         # add multiplicative noise
         if noise_range is not None:
             assert noise_range[0] < noise_range[1], "Wrong noise range."
-            noise = np.random.uniform(
-                noise_range[0], noise_range[1], size=kernel.shape
-            )
+            noise = np.random.uniform(noise_range[0], noise_range[1], size=kernel.shape)
             kernel = kernel * noise
         kernel = kernel / np.sum(kernel)
 
@@ -803,29 +772,23 @@ class Degradation:
             * special.j1(
                 cutoff
                 * np.sqrt(
-                    (x - (kernel_size - 1) / 2) ** 2
-                    + (y - (kernel_size - 1) / 2) ** 2
+                    (x - (kernel_size - 1) / 2) ** 2 + (y - (kernel_size - 1) / 2) ** 2
                 )
             )
             / (
                 2
                 * np.pi
                 * np.sqrt(
-                    (x - (kernel_size - 1) / 2) ** 2
-                    + (y - (kernel_size - 1) / 2) ** 2
+                    (x - (kernel_size - 1) / 2) ** 2 + (y - (kernel_size - 1) / 2) ** 2
                 )
             ),
             [kernel_size, kernel_size],
         )
-        kernel[(kernel_size - 1) // 2, (kernel_size - 1) // 2] = cutoff**2 / (
-            4 * np.pi
-        )
+        kernel[(kernel_size - 1) // 2, (kernel_size - 1) // 2] = cutoff**2 / (4 * np.pi)
         kernel = kernel / np.sum(kernel)
         if pad_to > kernel_size:
             pad_size = (pad_to - kernel_size) // 2
-            kernel = np.pad(
-                kernel, ((pad_size, pad_size), (pad_size, pad_size))
-            )
+            kernel = np.pad(kernel, ((pad_size, pad_size), (pad_size, pad_size)))
         return kernel
 
     def mesh_grid(self, kernel_size):
@@ -870,9 +833,7 @@ class Degradation:
             ndarray: Rotated sigma matrix.
         """
         D = np.array([[sig_x**2, 0], [0, sig_y**2]])
-        U = np.array(
-            [[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]
-        )
+        U = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
         return np.dot(U, np.dot(D, U.T))
 
     def generate_kernel1(self, image):
@@ -883,9 +844,7 @@ class Degradation:
                 omega_c = np.random.uniform(np.pi / 3, np.pi)
             else:
                 omega_c = np.random.uniform(np.pi / 5, np.pi)
-            kernel = self.circular_lowpass_kernel(
-                omega_c, kernel_size, pad_to=False
-            )
+            kernel = self.circular_lowpass_kernel(omega_c, kernel_size, pad_to=False)
         else:
             kernel = self.random_mixed_kernels(
                 self.kernel_list,
@@ -915,9 +874,7 @@ class Degradation:
                 omega_c = np.random.uniform(np.pi / 3, np.pi)
             else:
                 omega_c = np.random.uniform(np.pi / 5, np.pi)
-            kernel2 = self.circular_lowpass_kernel(
-                omega_c, kernel_size, pad_to=False
-            )
+            kernel2 = self.circular_lowpass_kernel(omega_c, kernel_size, pad_to=False)
         else:
             kernel2 = self.random_mixed_kernels(
                 self.kernel_list2,
@@ -953,21 +910,32 @@ class Degradation:
             radius (float): Kernel size of Gaussian blur. Default: 50.
             threshold (int):
         """
-        if self.sharpen_radius % 2 == 0:
-            self.sharpen_radius += 1
-        blur = cv2.GaussianBlur(
-            img, (self.sharpen_radius, self.sharpen_radius), 0
-        )
-        residual = img - blur
-        mask = np.abs(residual) * 255 > self.sharpen_threshold
-        mask = mask.astype("float32")
-        soft_mask = cv2.GaussianBlur(
-            mask, (self.sharpen_radius, self.sharpen_radius), 0
-        )
+        # if self.sharpen_radius % 2 == 0:
+        #     self.sharpen_radius += 1
+        # blur = cv2.GaussianBlur(img, (self.sharpen_radius, self.sharpen_radius), 0)
+        # residual = img - blur
+        # mask = np.abs(residual) * 255 > self.sharpen_threshold
+        # mask = mask.astype("float32")
+        # soft_mask = cv2.GaussianBlur(
+        #     mask, (self.sharpen_radius, self.sharpen_radius), 0
+        # )
 
-        K = img + self.sharpen_weight * residual
-        K = np.clip(K, 0, 1)
-        return soft_mask * K + (1 - soft_mask) * img
+        # K = img + self.sharpen_weight * residual
+        # K = np.clip(K, 0, 1)
+        # return soft_mask * K + (1 - soft_mask) * img
+
+        kernel_sharpening_hv = np.array(
+            [
+                [1, 4, 6, 4, 1],
+                [4, 16, 24, 16, 4],
+                [6, 24, -476, 24, 6],
+                [4, 16, 24, 16, 4],
+                [1, 4, 6, 4, 1],
+            ]
+        ) * (-1 / 256)
+
+        sharpened = cv2.filter2D(img, -1, kernel_sharpening_hv)
+        return sharpened
 
     def add_JPEG_noise(self, img):
         quality_factor = random.randint(self.jpeg_range[0], self.jpeg_range[1])
@@ -987,9 +955,9 @@ class Degradation:
                 np.float32
             )
         elif rnum < 0.4:  # add grayscale Gaussian noise
-            img += np.random.normal(
-                0, noise_level / 255.0, (*img.shape[:2], 1)
-            ).astype(np.float32)
+            img += np.random.normal(0, noise_level / 255.0, (*img.shape[:2], 1)).astype(
+                np.float32
+            )
         else:  # add  noise
             L = self.noise_level2 / 255.0
             D = np.diag(np.random.rand(3))
@@ -1019,8 +987,7 @@ class Degradation:
             img_gray = np.dot(img[..., :3], [0.299, 0.587, 0.114])
             img_gray = np.clip((img_gray * 255.0).round(), 0, 255) / 255.0
             noise_gray = (
-                np.random.poisson(img_gray * vals).astype(np.float32) / vals
-                - img_gray
+                np.random.poisson(img_gray * vals).astype(np.float32) / vals - img_gray
             )
             img += noise_gray[:, :, np.newaxis]
         img = np.clip(img, 0.0, 1.0)
@@ -1030,9 +997,7 @@ class Degradation:
         if np.random.uniform() < self.final_sinc_prob:
             kernel_size = random.choice(self.kernel_range)
             omega_c = np.random.uniform(np.pi / 3, np.pi)
-            sinc_kernel = self.circular_lowpass_kernel(
-                omega_c, kernel_size, pad_to=21
-            )
+            sinc_kernel = self.circular_lowpass_kernel(omega_c, kernel_size, pad_to=21)
         else:
             sinc_kernel = self.pulse_tensor
 

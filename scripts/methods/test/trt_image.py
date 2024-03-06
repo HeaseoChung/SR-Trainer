@@ -58,13 +58,9 @@ class TRT_Image(Tester):
         thread1.join()
 
     def img_test(self, q):
-        h_input = cuda.pagelocked_empty(
-            trt.volume(self.input_size), dtype=np.float32
-        )
+        h_input = cuda.pagelocked_empty(trt.volume(self.input_size), dtype=np.float32)
         d_input = cuda.mem_alloc(h_input.nbytes)
-        h_output = cuda.pagelocked_empty(
-            trt.volume(self.output_size), dtype=np.float32
-        )
+        h_output = cuda.pagelocked_empty(trt.volume(self.output_size), dtype=np.float32)
         d_output = cuda.mem_alloc(h_output.nbytes)
 
         images = []
@@ -123,9 +119,7 @@ class TRT_Image(Tester):
                 p = cv2.cvtColor(p, cv2.COLOR_BGR2RGB)
                 q.put(
                     (
-                        os.path.join(
-                            self.save_path, "SR_" + path.split("/")[-1]
-                        ),
+                        os.path.join(self.save_path, "SR_" + path.split("/")[-1]),
                         p,
                         i + 1,
                         total_frame,

@@ -61,9 +61,7 @@ class ImageDataset(Dataset):
             interpolation=cv2.INTER_CUBIC,
         )
 
-        hr, lr = random_crop(
-            hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf
-        )
+        hr, lr = random_crop(hr=hr, lr=lr, crop_size=self.patch_size, sf=self.sf)
 
         return self.to_tensor(lr), self.to_tensor(hr)
 
@@ -105,17 +103,15 @@ class ImagePairDataset(Dataset):
         return self.len
 
 
-@hydra.main(config_path="../../configs/", config_name="train.yaml")
+@hydra.main(config_path="../../configs/", config_name="train.yaml", version_base=None)
 def main(cfg):
     os.makedirs(cfg.train.common.save_img_dir, exist_ok=True)
 
     cfg.train.dataset.common.sf = 2
-    train_dataset = ImagePairDegradationDataset(
+    train_dataset = ImageDegradationDataset(
         cfg.train.dataset.common, cfg.train.dataset.train
     )
-    train_num_workers = (
-        cfg.train.dataset.train.num_workers * torch.cuda.device_count()
-    )
+    train_num_workers = cfg.train.dataset.train.num_workers * torch.cuda.device_count()
 
     dataloader = DataLoader(
         dataset=train_dataset,
@@ -126,14 +122,24 @@ def main(cfg):
         sampler=None,
         drop_last=True,
     )
-    for idx, (lr, hr) in enumerate(dataloader):
-        vutils.save_image(
-            lr, os.path.join(cfg.train.common.save_img_dir, f"lr_{idx}.png")
-        )
-        vutils.save_image(
-            hr, os.path.join(cfg.train.common.save_img_dir, f"hr_{idx}.png")
-        )
+
+    cnt = 0
+    for i in range(100):
+        for idx, (lr, hr) in tqdm(enumerate(dataloader)):
+            vutils.save_image(
+                lr,
+                os.path.join(cfg.train.common.save_img_dir, f"lr_{cnt}.png"),
+                **{"padding": 0},
+            )
+            vutils.save_image(
+                hr,
+                os.path.join(cfg.train.common.save_img_dir, f"hr_{cnt}.png"),
+                **{"padding": 0},
+            )
+            cnt += 1
 
 
 if __name__ == "__main__":
+    from tqdm import tqdm
+
     main()

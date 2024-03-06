@@ -38,7 +38,7 @@ class Trainer(Base):
         self.seed = cfg.train.common.seed
         self.use_wandb = cfg.train.common.use_wandb
         self.train_method = cfg.train.common.method
-        if self.use_wandb:
+        if self.use_wandb and gpu == 0:
             wandb.init(project=f"{cfg.models.generator.name}")
             wandb.config.update(cfg)
 
@@ -177,9 +177,7 @@ class Trainer(Base):
             cfg.train.dataset.train.batch_size / self.ngpus_per_node
         )
 
-        model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[self.gpu]
-        )
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[self.gpu])
 
         print("Initialized the Distributed Data Parallel")
         return model
@@ -221,15 +219,14 @@ class Trainer(Base):
                 results = img
             else:
                 results = torch.cat((results.detach(), img), 2)
-        vutils.save_image(
-            results, os.path.join(self.save_path, f"compare_{iter}.jpg")
-        )
+        vutils.save_image(results, os.path.join(self.save_path, f"compare_{iter}.jpg"))
 
     def _save_model(self, name, iter, model, optim, average):
-        if isinstance(model, nn.DataParallel):
-            state_dict = model.module.state_dict()
-        else:
-            state_dict = model.state_dict()
+        state_dict = (
+            model.module.state_dict()
+            if hasattr(model, "module")
+            else model.state_dict()
+        )
 
         if len(self.avgerage) <= 0:
             for k in self.metrics.keys():

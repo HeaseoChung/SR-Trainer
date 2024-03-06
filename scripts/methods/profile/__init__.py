@@ -41,10 +41,10 @@ class Profiler(Base):
         end = torch.cuda.Event(enable_timing=True)
 
         self.generator.eval()
-        inputs = torch.randn(1, self.size[0], self.size[1], self.size[2]).to(
+        inputs = torch.randn(self.size[0], self.size[1], self.size[2], self.size[3]).to(
             self.gpu
         )
-        input_dim = (self.size[0], self.size[1], self.size[2])
+        input_dim = (self.size[1], self.size[2], self.size[3])
 
         # GPU Warming up
         for _ in range(10):
@@ -72,14 +72,9 @@ class Profiler(Base):
         print("{:>16s} : {:<.4f} [M]".format("#Activations", activations))
         print("{:>16s} : {:<d}".format("#Conv2d", num_conv))
 
-        num_parameters = sum(
-            map(lambda x: x.numel(), self.generator.parameters())
-        )
+        num_parameters = sum(map(lambda x: x.numel(), self.generator.parameters()))
         num_parameters = num_parameters / 10**6
         print("{:>16s} : {:<.4f} [M]".format("#Params", num_parameters))
 
-        max_mem = (
-            torch.cuda.max_memory_allocated(torch.cuda.current_device())
-            / 1024**2
-        )
-        print("{:>16s} : {:<.3f} [M]".format("Max Memery", max_mem))
+        max_mem = torch.cuda.max_memory_allocated(torch.cuda.current_device()) / 1024**2
+        print("{:>16s} : {:<.3f} [M]".format("Max Memory", max_mem))

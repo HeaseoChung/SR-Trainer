@@ -52,6 +52,17 @@ def define_model(configs, gpu):
         from archs.RRSR.infer_models import Generator
 
         model = Generator(configs).to(gpu)
+
+    elif model_name == "lgu_infer":
+        from archs.LGU_rrnet.infer_models import Generator
+
+        model = Generator(configs).to(gpu)
+
+    elif model_name == "lgu_train":
+        from archs.LGU_rrnet.train_models import Generator
+
+        model = Generator(configs).to(gpu)
+
     elif model_name == "unet_discriminator":
         from archs.Discriminators.unet_discriminator import Discriminator
 

@@ -26,10 +26,7 @@ def merge_bn(w, b, gamma, beta, mean, var, eps, before_conv=True):
 
     # Reparameterizing bias
     if before_conv:
-        rep_b = (
-            torch.mm(torch.sum(w, dim=(2, 3)), bn_bias.unsqueeze(1)).squeeze()
-            + b
-        )
+        rep_b = torch.mm(torch.sum(w, dim=(2, 3)), bn_bias.unsqueeze(1)).squeeze() + b
     else:
         rep_b = b.mul(scale) + bn_bias
 
@@ -40,9 +37,7 @@ def bn_parameter(pretrain_state_dict, k, dst="bn1"):
     src = k.split(".")[-2]
     gamma = pretrain_state_dict[k.replace(src, dst)]
     beta = pretrain_state_dict[k.replace(f"{src}.weight", f"{dst}.bias")]
-    mean = pretrain_state_dict[
-        k.replace(f"{src}.weight", f"{dst}.running_mean")
-    ]
+    mean = pretrain_state_dict[k.replace(f"{src}.weight", f"{dst}.running_mean")]
     var = pretrain_state_dict[k.replace(f"{src}.weight", f"{dst}.running_var")]
     eps = 1e-05
 
@@ -55,9 +50,11 @@ def main(cfg):
     model = define_model(cfg.models.generator, 0).cuda()
     print(model.state_dict().keys())
     rep_state_dict = model.state_dict()
-    pretrain_state_dict = torch.load(
-        cfg.models.generator.path, map_location="cuda"
-    )["model"]
+
+    pretrain_state_dict = torch.load(cfg.models.generator.path, map_location="cuda")
+
+    if len(pretrain_state_dict) == 3:
+        pretrain_state_dict = pretrain_state_dict["model"]
 
     for k, v in tqdm(rep_state_dict.items()):
         # merge conv1x1-conv3x3-conv1x1
@@ -79,18 +76,14 @@ def main(cfg):
 
             # second step: merge the first 1x1 convolution and the next 3x3 convolution
             merge_k0k1 = F.conv2d(input=k1, weight=k0.permute(1, 0, 2, 3))
-            merge_b0b1 = (
-                b0.view(1, -1, 1, 1) * torch.ones(1, mid_feats, 3, 3).cuda()
-            )
+            merge_b0b1 = b0.view(1, -1, 1, 1) * torch.ones(1, mid_feats, 3, 3).cuda()
             merge_b0b1 = F.conv2d(input=merge_b0b1, weight=k1, bias=b1)
 
             # third step: merge the remain 1x1 convolution
             merge_k0k1k2 = F.conv2d(
                 input=merge_k0k1.permute(1, 0, 2, 3), weight=k2
             ).permute(1, 0, 2, 3)
-            merge_b0b1b2 = F.conv2d(input=merge_b0b1, weight=k2, bias=b2).view(
-                -1
-            )
+            merge_b0b1b2 = F.conv2d(input=merge_b0b1, weight=k2, bias=b2).view(-1)
 
             # last step: remove the global identity
             for i in range(n_feats):
@@ -111,9 +104,7 @@ def main(cfg):
                 pretrain_state_dict, k, dst="bn1"
             )
 
-            rep_w, rep_b = merge_bn(
-                w, b, gamma, beta, mean, var, eps, before_conv=True
-            )
+            rep_w, rep_b = merge_bn(w, b, gamma, beta, mean, var, eps, before_conv=True)
 
             rep_state_dict[k] = rep_w
             rep_state_dict[bias_str] = rep_b

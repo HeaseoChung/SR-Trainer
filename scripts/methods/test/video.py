@@ -20,7 +20,7 @@ class Video(Tester):
         self.generator = self._load_state_dict(
             cfg.models.generator.path, self.generator
         )
-        self.img_test()
+        self.video_test()
 
     def video_test(self):
         videos = []

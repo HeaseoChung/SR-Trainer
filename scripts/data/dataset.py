@@ -13,8 +13,8 @@ from data.utils import load_image_file, modcrop
 
 
 class ImageDegradationDataset(Dataset):
-    def __init__(self, common, dataset):
-        self.data_pipeline = Degradation(common, dataset)
+    def __init__(self, scale, dataset):
+        self.data_pipeline = Degradation(scale, dataset)
 
         self.hrfiles = load_image_file(dataset.hr_dir)
 
@@ -33,9 +33,9 @@ class ImageDegradationDataset(Dataset):
 
 
 class ImageDataset(Dataset):
-    def __init__(self, common, dataset):
+    def __init__(self, scale, dataset):
         self.hrfiles = load_image_file(dataset.hr_dir)
-        self.sf = common.sf
+        self.sf = scale
         self.gt_size = dataset.gt_size
         self.patch_size = dataset.patch_size
 
@@ -70,8 +70,8 @@ class ImageDataset(Dataset):
 
 
 class ImagePairDataset(Dataset):
-    def __init__(self, common, dataset):
-        self.sf = common.sf
+    def __init__(self, scale, dataset):
+        self.sf = scale
         self.patch_size = dataset.patch_size
         self.rand_crop = False if self.patch_size == -1 else True
 
@@ -103,7 +103,7 @@ class ImagePairDataset(Dataset):
         return self.len
 
 
-@hydra.main(config_path="../../configs/", config_name="train.yaml", version_base=None)
+@hydra.main(config_path="../../configs/", config_name="train.yaml")
 def main(cfg):
     os.makedirs(cfg.train.common.save_img_dir, exist_ok=True)
 

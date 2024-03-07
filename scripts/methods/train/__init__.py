@@ -112,13 +112,11 @@ class Trainer(Base):
                 for batch in loader:
                     yield batch
 
-        cfg.train.dataset.common.sf = self.scale
-
         train_dataset = define_dataset(
-            cfg.train.dataset.common, cfg.train.dataset.train
+            cfg.models.generator.scale, cfg.train.dataset.train
         )
         valid_dataset = define_dataset(
-            cfg.train.dataset.common, cfg.train.dataset.valid
+            cfg.models.generator.scale, cfg.train.dataset.valid
         )
 
         train_num_workers = (

@@ -21,8 +21,8 @@ from data.augmentation import (
 
 
 class Degradation:
-    def __init__(self, common, dataset):
-        self.sf = common.sf
+    def __init__(self, scale, dataset):
+        self.sf = scale
         self.patch_size = dataset.patch_size
         self.gt_size = dataset.gt_size
         self.shuffle_prob = dataset.ImageDegradationDataset.deg.shuffle_prob

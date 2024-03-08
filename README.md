@@ -12,6 +12,7 @@
 
 ## Updates
 - **_News (2024-03-08)_**: Fixed minor issues and being preparing to implement MLFlow
+- **_News (2023-12-08)_**: Implemented warm start and finetune strategy for training
 - **_News (2023-05-12)_**: Implemented conversion for ONNX and TensorRT inference
 - **_News (2023-05-01)_**: Refactored codes
 - **_News (2023-02-13)_**: Implemented profiler to check spec of models
@@ -39,6 +40,8 @@
 ## Train Approaches
 - NET
 - GAN
+- WS
+- FT
 
 ## SR Trainer Structures
 

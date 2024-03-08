@@ -13,6 +13,7 @@
 ## Updates
 - **_News (2024-03-08)_**: Fixed minor issues and being preparing to implement MLFlow
 - **_News (2023-12-08)_**: Implemented warm start and finetune strategy for training
+- **_News (2023-08-21)_**: Implemented profiling model to check its FLOPs, inference time, memory footprint, etc
 - **_News (2023-05-12)_**: Implemented conversion for ONNX and TensorRT inference
 - **_News (2023-05-01)_**: Refactored codes
 - **_News (2023-02-13)_**: Implemented profiler to check spec of models
@@ -60,7 +61,9 @@ configs/
 │   └── video.yaml
 ├── train
 │   ├── GAN.yaml
-│   └── PSNR.yaml
+│   └── NET.yaml
+│   └── WS.yaml
+│   └── KD.yaml
 ├── test.yaml
 └── train.yaml
 ```
@@ -200,6 +203,42 @@ dataset:
 metrics: [psnr, ssim, lpips, erqa]
 ```
 
+#### Profiling
+
+```yaml
+hydra:
+  run:
+    dir: ./outputs/EDSR/profile/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+defaults:
+  - _self_
+  - models: EDSR
+
+data:
+  batch: 1
+  channel: 3
+  width: 1920
+  height: 1088
+```
+
+#### ONNX Converting
+```yaml
+hydra:
+  run:
+    dir: ./outputs/EDSR/onnx/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+defaults:
+  - _self_
+  - models: EDSR
+
+data:
+  dynamic_shape: True
+  batch: 1
+  channel: 3
+  width: 1920
+  height: 1080
+```
+
 ### 3. Run
 
 ```python
@@ -213,6 +252,16 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python trainer.py
 ```python
 ### tester.py for test a model
 CUDA_VISIBLE_DEVICES=0 python tester.py
+```
+
+```python
+### pytorch2onnx.py for converting a model to ONNX
+CUDA_VISIBLE_DEVICES=0 python pytorch2onnx.py
+```
+
+```python
+### profiler.py for profiler a model
+CUDA_VISIBLE_DEVICES=0 python profiler.py
 ```
 
 ## Citation

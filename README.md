@@ -34,8 +34,9 @@
 - SwinIR
 
 ## Features
-- Training super-resolution using NET and GAN approaches
+- Training super-resolution using NET, GAN, Knowledge Distillation approaches
 - Testing super-resolution models for image and video
+- Converting PyTorch based super-resolution models to ONNX
 
 ## Train Approaches
 - NET

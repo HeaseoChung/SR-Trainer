@@ -7,15 +7,6 @@ class GAN(Trainer):
         super().__init__(gpu, cfg)
         self.generator = self._init_model(cfg.models.generator, cfg)
         self.discriminator = self._init_model(cfg.models.discriminator, cfg)
-
-        if cfg.train.ddp.distributed:
-            self.generator = self._init_distributed_data_parallel(
-                cfg, self.generator
-            )
-            self.discriminator = self._init_distributed_data_parallel(
-                cfg, self.discriminator
-            )
-
         self.g_optim = self._init_optim(cfg, self.generator)
         self.d_optim = self._init_optim(cfg, self.discriminator)
 
@@ -43,9 +34,7 @@ class GAN(Trainer):
                 average = self._valid(self.generator)
                 self._print(average)
                 self._save_model("g", i, self.generator, self.g_optim, average)
-                self._save_model(
-                    "d", i, self.discriminator, self.d_optim, average
-                )
+                self._save_model("d", i, self.discriminator, self.d_optim, average)
 
     def train(self, iter):
         self.generator.train()

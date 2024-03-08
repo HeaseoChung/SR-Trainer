@@ -8,14 +8,6 @@ class KD(Trainer):
         self.teacher = self._init_model(cfg.models.teacher, cfg)
         self.student = self._init_model(cfg.models.student, cfg)
 
-        if cfg.train.ddp.distributed:
-            self.teacher = self._init_distributed_data_parallel(
-                cfg, self.teacher
-            )
-            self.student = self._init_distributed_data_parallel(
-                cfg, self.student
-            )
-
         self.t_optim = self._init_optim(cfg, self.teacher)
         self.s_optim = self._init_optim(cfg, self.student)
 

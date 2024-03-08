@@ -6,10 +6,6 @@ class WS(Trainer):
     def __init__(self, gpu, cfg):
         super().__init__(gpu, cfg)
         self.generator = self._init_model(cfg.models.generator, cfg)
-        if cfg.train.ddp.distributed:
-            self.generator = self._init_distributed_data_parallel(
-                cfg, self.generator
-            )
         self.g_optim = self._init_optim(cfg, self.generator)
         self.generator, self.g_optim = self._load_state_dict(
             cfg.models.generator.path, self.generator, self.g_optim

@@ -4,4 +4,6 @@ outputs
 *.trt
 model_zoo
 scripts/archs/RRSR
+scripts/archs/LGU*
+configs/models/LGU*
 testsets

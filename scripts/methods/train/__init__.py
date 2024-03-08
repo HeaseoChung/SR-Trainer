@@ -80,17 +80,25 @@ class Trainer(Base):
             print(
                 f"Load Checkpoint: Checkpoint is going to be used, Loading the checkpoint from : {path}"
             )
+
             ckpt = torch.load(
                 path,
                 map_location=lambda storage, loc: storage,
             )
+
             if len(ckpt) == 3:
-                model.load_state_dict(ckpt["model"])
-                if self.train_method == "NET":
-                    optim.load_state_dict(ckpt["optimimizer"])
-                    self.start_iters = ckpt["iteration"] + 1
+                ckpt_model = ckpt["model"]
+                optim.load_state_dict(ckpt["optimimizer"])
+                self.start_iters = ckpt["iteration"] + 1
             else:
-                model.load_state_dict(ckpt)
+                ckpt_model = ckpt
+
+            if isinstance(model, torch.nn.parallel.distributed.DistributedDataParallel):
+                new_state_dict = {}
+                for k, v in ckpt_model.items():
+                    new_state_dict["module." + k] = v
+                ckpt_model = new_state_dict
+            model.load_state_dict(ckpt_model)
         else:
             self.start_iters = 0
             print("Load Checkpoint: Checkpoint is not going to be used")

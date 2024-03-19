@@ -6,7 +6,7 @@
   - pip install mlflow
   - modify config/train/**.yaml
     - mlflow true
-    - mlflow host, port (ex. host 127.0.0.1, port 8080)
+    - mlflow host, port, experiment_name (ex. host 127.0.0.1, port 8080, experiment_name test)
   - run and track your training process😎
 
 ## Contents

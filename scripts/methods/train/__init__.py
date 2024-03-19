@@ -17,6 +17,8 @@ from methods.train.optim import define_optim
 from methods.train.learning_rate_scheduler import define_LR_scheduler
 from methods.metric import define_metrics
 
+import mlflow
+from torchinfo import summary
 
 class Trainer(Base):
     def __init__(self, gpu, cfg):
@@ -37,6 +39,7 @@ class Trainer(Base):
         self.end_iters = cfg.train.common.iteration
         self.seed = cfg.train.common.seed
         self.use_wandb = cfg.train.common.use_wandb
+        self.use_mlflow = cfg.train.common.use_mlflow
         self.train_method = cfg.train.common.method
         if self.use_wandb and gpu == 0:
             wandb.init(project=f"{cfg.models.generator.name}")
@@ -73,6 +76,9 @@ class Trainer(Base):
         if cfg_train.train.ddp.distributed:
             print("Init distributed data parallel")
             model = self._init_distributed_data_parallel(cfg_train, model)
+        with open("model_summary.txt","w") as f:
+            f.write(str(summary(model)))
+        mlflow.log_artifact("model_summary.txt")
         return model
 
     def _load_state_dict(self, path, model, optim):
@@ -199,14 +205,18 @@ class Trainer(Base):
         for k in self.metrics.keys():
             scores[k] = []
 
+        print("len:",len(self.valid_dataloader))
+
         for lr, hr in self.valid_dataloader:
             lr = lr.to(self.gpu)
+            #print("lr shape:",lr.shape,end="  ")
             hr = hr.to(self.gpu)
-
+            #print("hr shape:",hr.shape,end="  ")
             with torch.no_grad():
                 preds = model(lr)
 
             preds = postprocess(preds)
+            #print("preds shape:",lr.shape,end="  ")
             hr = postprocess(hr)
             hr = modcrop(hr, self.scale)
 
@@ -245,6 +255,8 @@ class Trainer(Base):
                     state_dict,
                     os.path.join(self.save_path, f"best_{k}.pth"),
                 )
+                if self.use_mlflow:
+                    mlflow.pytorch.log_model(model,"best_model.pth")
 
         torch.save(
             {
@@ -255,8 +267,17 @@ class Trainer(Base):
             os.path.join(self.save_path, f"{name}_{str(iter).zfill(6)}.pth"),
         )
 
-    def _print(self, log):
+    def _print(self,log,metric=None,step=0):
         if self.use_wandb:
             wandb.log(log)
         else:
             print(log)
+
+        if self.use_mlflow:
+            if type(log) == dict:
+                for key,val in log.items():
+                    mlflow.log_metric(key,val,step=step)
+
+            else:
+                mlflow.log_metric(metric,log,step=step)
+ 

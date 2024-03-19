@@ -1,7 +1,13 @@
 <a href="https://github.com/HeaseoChung/DL-Optimization/tree/master/Python/TensorRT/x86"><img src="https://img.shields.io/badge/-Documentation-brightgreen"/></a>
 
 # SR Trainer - mlflow
-- SR trainer optimized with mlflow 👏👏
+- SR trainer optimized with MLFlow 👏👏
+- how to use
+  - pip install mlflow
+  - modify config/train/**.yaml
+    - mlflow true
+    - mlflow host, port (ex. host 127.0.0.1, port 8080)
+  - run and track your training process😎
 
 ## Contents
 - [Updates](#updates)
@@ -11,6 +17,7 @@
 - [Citation](#citation)
 
 ## Updates
+- **_News (2024-03-19)_**: Implemented MLFlow tracking
 - **_News (2024-03-08)_**: Fixed minor issues and being preparing to implement MLFlow
 - **_News (2023-12-08)_**: Implemented warm start and finetune strategy for training
 - **_News (2023-08-21)_**: Implemented profiling model to check its FLOPs, inference time, memory footprint, etc

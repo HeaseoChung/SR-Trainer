@@ -44,24 +44,24 @@ def define_model(configs, gpu):
 
         model = Generator(configs).to(gpu)
 
-    elif model_name == "rrsr_train":
-        from archs.RRSR.train_models import Generator
+    # elif model_name == "rrsr_train":
+    #     from archs.RRSR.train_models import Generator
 
-        model = Generator(configs).to(gpu)
-    elif model_name == "rrsr_infer":
-        from archs.RRSR.infer_models import Generator
+    #     model = Generator(configs).to(gpu)
+    # elif model_name == "rrsr_infer":
+    #     from archs.RRSR.infer_models import Generator
 
-        model = Generator(configs).to(gpu)
+    #     model = Generator(configs).to(gpu)
 
-    elif model_name == "lgu_infer":
-        from archs.LGU_rrnet.infer_models import Generator
+    # elif model_name == "lgu_infer":
+    #     from archs.LGU_rrnet.infer_models import Generator
 
-        model = Generator(configs).to(gpu)
+    #     model = Generator(configs).to(gpu)
 
-    elif model_name == "lgu_train":
-        from archs.LGU_rrnet.train_models import Generator
+    # elif model_name == "lgu_train":
+    #     from archs.LGU_rrnet.train_models import Generator
 
-        model = Generator(configs).to(gpu)
+        # model = Generator(configs).to(gpu)
 
     elif model_name == "unet_discriminator":
         from archs.Discriminators.unet_discriminator import Discriminator

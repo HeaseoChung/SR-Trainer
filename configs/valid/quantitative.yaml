@@ -9,8 +9,8 @@ dataset:
 
   valid:
     type: ImagePairDataset
-    hr_dir: /workspace/SR/SR-Trainer/testsets/Set5/HR
-    lr_dir: /workspace/SR/SR-Trainer/testsets/Set5/LR
+    hr_dir: /workspace/pigmania/dataset/jaheoble/val/div2KRK/gt
+    lr_dir: 
     patch_size : -1
     batch_size: 1
     num_workers: 4

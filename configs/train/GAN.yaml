@@ -5,10 +5,16 @@ common:
   save_model_every: 10000
   seed: 123
   use_wandb: false
+  use_mlflow: true
   ckpt_dir: "gan_cpkt"
   save_img_dir: "images"
   method: GAN
 
+mlflow:
+  host: "127.0.0.1"
+  port: "8080"
+  experiment_name: "test"
+  
 ddp:
   distributed: false
   nodes: 1

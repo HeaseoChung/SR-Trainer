@@ -1,9 +1,11 @@
 type: ImageDegradationDataset
-hr_dir: /dataset/NTIRE2023/HR/train/
+hr_dir: "/workspace/pigmania/dataset/jaheoble/val/PIPAL/gt"
 lr_dir: ""
-gt_size: 320
-patch_size : 256
-batch_size: 64
+gt_size: 128
+# patch_size : 256
+# batch_size: 64
+patch_size : 64
+batch_size: 1
 num_workers: 8
 
 ImageDegradationDataset: 

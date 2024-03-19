@@ -23,7 +23,7 @@ class Net(Trainer):
 
             if i % self.save_model_every == 0 and self.gpu == 0:
                 average = self._valid(self.generator)
-                self._print(average)
+                self._print(average,"average",step=i)
                 self._save_model("g", i, self.generator, self.g_optim, average)
 
     def _train(self, iter):
@@ -48,7 +48,7 @@ class Net(Trainer):
         self.g_scheduler.step()
 
         if iter % self.save_log_every == 0 and self.gpu == 0:
-            self._print(losses)
+            self._print(losses,"losses",step=iter)
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
             lr = F.interpolate(lr, scale_factor=self.scale, mode="nearest")

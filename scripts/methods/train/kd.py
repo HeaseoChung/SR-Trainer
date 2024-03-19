@@ -34,7 +34,7 @@ class KD(Trainer):
 
             if i % self.save_model_every == 0 and self.gpu == 0:
                 average = self._valid(self.student)
-                self._print(average)
+                self._print(average,step=i)
                 self._save_model("g", i, self.student, self.s_optim, average)
 
     def _train(self, iter):
@@ -70,7 +70,7 @@ class KD(Trainer):
         self.s_scheduler.step()
 
         if iter % self.save_log_every == 0 and self.gpu == 0:
-            self._print(losses)
+            self._print(losses,step=iter)
 
         if iter % self.save_img_every == 0 and self.gpu == 0:
             self._visualize(iter, [hr, t_preds, s_preds])

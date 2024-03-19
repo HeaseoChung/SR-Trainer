@@ -1,5 +1,5 @@
 type: ImageDegradationDataset
-hr_dir: /dataset/NTIRE2023/HR/train/
+hr_dir: "/workspace/pigmania/dataset/jaheoble/train"
 lr_dir: ""
 gt_size: 320
 patch_size : 256
